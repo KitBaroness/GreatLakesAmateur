@@ -1,4 +1,4 @@
-# GreatLakesAmateur - FlexNet JSX Vanilla JS Site
+# GreatLakesAmateur - FlexNet JSX Architecture
 
 This repository is a static replication of [michiganplayersgolfclub.com](https://www.michiganplayersgolfclub.com/) converted into a FlexNet JSX architecture for the Michigan Players Golf Club and Great Lakes Amateur tournament site.
 
