@@ -21,6 +21,33 @@ This project intentionally uses:
 
 The `example/` folder is reference material for FlexNet JSX architecture only. Do not edit `example/` when changing this site.
 
+## Runtime Router And Load Strategy
+
+FlexNet Runtime Router keeps the application in one static HTML shell and loads only the requested page fragment from `public/views/`. The header, footer, config, router, and BEM stylesheet stay consistent across routes, which reduces repeated page setup work compared with loading a separate full HTML document for every page.
+
+This approach improves load behavior across mobile, tablet, and desktop devices because:
+
+- The browser loads one shared shell, one shared runtime, and one shared BEM stylesheet.
+- Route changes fetch only the view fragment needed for the current page.
+- Shared layout rendering stays centralized, reducing duplicated markup and timing drift between pages.
+- BEM CSS keeps component styling predictable across browsers and operating systems.
+- Legacy top-level URLs redirect into the same runtime path, preventing fragmented page behavior.
+
+The result is a more consistent experience across device sizes, operating systems, and browsers while preserving a static deployment model.
+
+## Security Caveats
+
+This is a static frontend site. Static delivery reduces server-side attack surface because there is no Node production runtime, database session, or application server running inside this repository.
+
+Security boundaries still matter:
+
+- Do not store payment provider secrets, email API keys, private tokens, or credentials in frontend JavaScript.
+- `mailto:`, `sms:`, and `tel:` links open the visitor's local apps; they do not securely submit private data to a server.
+- The contact form currently opens a prefilled email and does not send server-side email by itself.
+- Wix checkout links depend on Wix runtime behavior and should not be treated as direct payment API endpoints.
+- Any future automatic email delivery, payment checkout, or sponsor payment flow should use a secure backend endpoint such as a Cloudflare Pages Function with environment variables.
+- Any server-side endpoint should validate inputs, rate limit submissions, avoid exposing secrets, and return only the minimum response data needed by the browser.
+
 ## Functional Structure
 
 - `src/core/site-config.js`: Frozen site data, payment/contact config, and pure query helpers.
