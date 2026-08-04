@@ -110,6 +110,74 @@ const hydratePaymentLinks = (config) => {
 };
 
 /**
+ * @effect
+ * @param {HTMLAnchorElement} link
+ * @param {Object} action
+ * @returns {void}
+ */
+const hydrateContactLink = (link, action) => {
+  link.setAttribute('href', action.href);
+  link.setAttribute('title', action.title || action.label);
+  link.setAttribute('aria-label', action.title || action.label);
+  link.removeAttribute('target');
+  link.removeAttribute('rel');
+
+  const labelTarget = link.querySelector('[data-contact-label-target]');
+
+  if (labelTarget) {
+    labelTarget.textContent = action.label;
+  } else if (!link.textContent.trim()) {
+    link.textContent = action.label;
+  }
+};
+
+/**
+ * @effect
+ * @param {Object} config
+ * @returns {void}
+ */
+const hydrateContactLinks = (config) => {
+  const getContactAction = window.FlexNetSiteConfig?.getContactAction;
+
+  document.querySelectorAll('[data-contact-action]').forEach((link) => {
+    const key = link.getAttribute('data-contact-action');
+    const action = getContactAction ? getContactAction(config, key) : null;
+
+    if (action?.href) {
+      hydrateContactLink(link, action);
+    }
+  });
+};
+
+/**
+ * @pure
+ * @param {Object} config
+ * @param {HTMLFormElement} form
+ * @returns {String}
+ */
+const buildContactFormMailto = (config, form) => {
+  const contact = window.FlexNetSiteConfig?.getContact(config);
+  const formData = new FormData(form);
+  const name = String(formData.get('name') || '').trim();
+  const email = String(formData.get('email') || '').trim();
+  const message = String(formData.get('message') || '').trim();
+  const subject = `Great Lakes Amateur Website Inquiry${name ? ` from ${name}` : ''}`;
+  const body = [
+    'Hello Ryan,',
+    '',
+    'I am reaching out through the Great Lakes Amateur website.',
+    '',
+    `Name: ${name}`,
+    `Email: ${email}`,
+    '',
+    'Message:',
+    message
+  ].join('\n');
+
+  return `mailto:${contact.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+};
+
+/**
  * @pure
  * @param {HTMLElement} trigger
  * @param {Object} config
@@ -130,7 +198,7 @@ const handlePaymentFallback = (trigger, config) => {
   const label = configuredPayment?.label || trigger.getAttribute('data-payment-label') || 'Payment';
   const payment = window.FlexNetSiteConfig?.getPayments(config);
   const message = payment
-    ? `${label} ${payment.fallbackMessage} Phone: ${payment.fallbackPhone}. Email: ${payment.fallbackEmail}.`
+    ? `${label} ${payment.fallbackMessage} Please use the Contact page call, text, or email options.`
     : `${label} checkout link is not configured yet.`;
 
   window.alert(message);
@@ -177,8 +245,7 @@ const bindGlobalInteractions = (config) => {
     if (!form) return;
 
     event.preventDefault();
-    window.alert('Thank you for your message! Form submission is not yet configured.');
-    form.reset();
+    window.location.href = buildContactFormMailto(config, form);
   });
 };
 
@@ -198,11 +265,13 @@ const initializeApp = () => {
   renderFooter(config);
   bindGlobalInteractions(config);
   hydratePaymentLinks(config);
+  hydrateContactLinks(config);
 
   window.addEventListener('routechange', (event) => {
     renderHeader(config, event.detail.path);
     closeMobileNavigation();
     hydratePaymentLinks(config);
+    hydrateContactLinks(config);
   });
 
   window.FlexNetApp = createRouter(config, {

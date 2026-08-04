@@ -168,7 +168,7 @@ export const createRouter = (config, options = {}) => {
     if (!link) return;
 
     const href = link.getAttribute('href');
-    if (!href || href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('tel:')) {
+    if (!href || href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('sms:')) {
       return;
     }
 

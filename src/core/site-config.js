@@ -21,7 +21,56 @@
 
   const paymentContact = {
     phone: '330-990-7738',
+    phoneE164: '+13309907738',
     email: 'yipper.rmy@gmail.com'
+  };
+
+  /**
+   * @pure
+   * @param {Object} params
+   * @returns {String}
+   */
+  const buildMailtoLink = ({ subject, body }) => (
+    `mailto:${paymentContact.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+  );
+
+  /**
+   * @pure
+   * @param {String} body
+   * @returns {String}
+   */
+  const buildSmsLink = (body) => `sms:${paymentContact.phoneE164}?body=${encodeURIComponent(body)}`;
+
+  const inquiryCopy = {
+    general: [
+      'Hello Ryan,',
+      '',
+      'I am contacting you about the Great Lakes Amateur. Please let me know the best next step.',
+      '',
+      'Name:',
+      'Phone:',
+      'Inquiry:'
+    ].join('\n'),
+    entryFee: [
+      'Hello Ryan,',
+      '',
+      'I am interested in the 2026 Great Lakes Amateur entry fee and payment options. Please send the next steps for enrollment.',
+      '',
+      'Name:',
+      'Phone:',
+      'Player Name:',
+      'Question:'
+    ].join('\n'),
+    sponsorship: [
+      'Hello Ryan,',
+      '',
+      'I am interested in Great Lakes Amateur sponsorship opportunities. Please send the next steps for sponsorship payment and deliverables.',
+      '',
+      'Name:',
+      'Company:',
+      'Phone:',
+      'Sponsorship Interest:'
+    ].join('\n')
   };
 
   /**
@@ -37,7 +86,7 @@
       'Please send payment instructions and sponsorship next steps.'
     ].join('\n');
 
-    return `mailto:${paymentContact.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    return buildMailtoLink({ subject, body });
   };
 
   const siteConfig = deepFreeze({
@@ -103,6 +152,71 @@
         description: 'Sponsorship opportunities for the Great Lakes Amateur golf tournament.'
       }
     ],
+    contact: {
+      name: 'Ryan Yip',
+      role: 'Tournament Committee',
+      phoneDisplay: paymentContact.phone,
+      phoneHref: `tel:${paymentContact.phoneE164}`,
+      smsHref: buildSmsLink(inquiryCopy.general),
+      email: paymentContact.email,
+      emailHref: buildMailtoLink({
+        subject: 'Great Lakes Amateur Inquiry',
+        body: inquiryCopy.general
+      }),
+      actions: {
+        callGeneral: {
+          key: 'callGeneral',
+          label: 'Call Ryan',
+          href: `tel:${paymentContact.phoneE164}`,
+          title: 'Call Ryan Yip about the Great Lakes Amateur'
+        },
+        smsGeneral: {
+          key: 'smsGeneral',
+          label: 'Text Ryan',
+          href: buildSmsLink(inquiryCopy.general),
+          title: 'Text Ryan Yip about the Great Lakes Amateur'
+        },
+        emailGeneral: {
+          key: 'emailGeneral',
+          label: 'Email Ryan',
+          href: buildMailtoLink({
+            subject: 'Great Lakes Amateur Inquiry',
+            body: inquiryCopy.general
+          }),
+          title: 'Email Ryan Yip about the Great Lakes Amateur'
+        },
+        smsEntryFee: {
+          key: 'smsEntryFee',
+          label: 'Text About Entry Fee',
+          href: buildSmsLink(inquiryCopy.entryFee),
+          title: 'Text Ryan Yip about the Great Lakes Amateur entry fee'
+        },
+        emailEntryFee: {
+          key: 'emailEntryFee',
+          label: 'Email Entry Fee Inquiry',
+          href: buildMailtoLink({
+            subject: 'Great Lakes Amateur Entry Fee Inquiry',
+            body: inquiryCopy.entryFee
+          }),
+          title: 'Email Ryan Yip about the Great Lakes Amateur entry fee'
+        },
+        smsSponsorship: {
+          key: 'smsSponsorship',
+          label: 'Text About Sponsorship',
+          href: buildSmsLink(inquiryCopy.sponsorship),
+          title: 'Text Ryan Yip about Great Lakes Amateur sponsorship'
+        },
+        emailSponsorship: {
+          key: 'emailSponsorship',
+          label: 'Email Sponsorship Inquiry',
+          href: buildMailtoLink({
+            subject: 'Great Lakes Amateur Sponsorship Inquiry',
+            body: inquiryCopy.sponsorship
+          }),
+          title: 'Email Ryan Yip about Great Lakes Amateur sponsorship'
+        }
+      }
+    },
     payments: {
       fallbackPhone: paymentContact.phone,
       fallbackEmail: paymentContact.email,
@@ -233,6 +347,24 @@
   /**
    * @pure
    * @param {Object} config
+   * @returns {Object}
+   */
+  const getContact = (config) => config.contact;
+
+  /**
+   * @pure
+   * @param {Object} config
+   * @param {String} key
+   * @returns {Object|null}
+   */
+  const getContactAction = (config, key) => {
+    const contact = getContact(config);
+    return contact.actions[key] || null;
+  };
+
+  /**
+   * @pure
+   * @param {Object} config
    * @param {String} key
    * @returns {Object|null}
    */
@@ -295,6 +427,8 @@
     getCallsToAction,
     getFooter,
     getPayments,
+    getContact,
+    getContactAction,
     getPaymentOption,
     buildRoutes,
     findPageByRoute

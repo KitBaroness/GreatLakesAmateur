@@ -86,7 +86,7 @@ Then visit `http://localhost:8080/index.html#/home`.
 - **Shared layout**: Edit `src/core/layout/renderHeader.js` or `src/core/layout/renderFooter.js`.
 - **Styles**: Edit BEM components in `css/styles.css`.
 - **Payment links**: Payment behavior is centralized in `src/core/site-config.js`. The entry fee currently opens the original Wix event-details payment page because Wix Pay creates checkout orders inside the Wix runtime. Sponsorship buttons use invoice request email links because the original Wix sponsorship page does not expose direct sponsor checkout endpoints.
-- **Contact form**: Submits to a placeholder alert in `src/core/loader.js`.
+- **Contact links and form**: Call, text, and email actions are centralized in `src/core/site-config.js`; the contact form opens a prefilled `mailto:` message from `src/core/loader.js`.
 - **Copy**: Tournament copy has been normalized for a professional amateur golf audience while preserving the original event details.
 
 ## Source

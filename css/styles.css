@@ -630,6 +630,62 @@ textarea:focus-visible {
   text-underline-offset: 3px;
 }
 
+.c-contact-actions {
+  display: flex;
+  margin-top: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.c-contact-actions--inline {
+  margin-top: 10px;
+  justify-content: flex-start;
+}
+
+.c-contact-actions--centered {
+  margin-top: 16px;
+}
+
+.c-contact-actions__link,
+.c-content .c-contact-actions__link {
+  display: inline-flex;
+  min-height: 42px;
+  padding: 10px 16px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-lake);
+  border-radius: 4px;
+  color: var(--color-lake);
+  background: var(--color-surface);
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.2;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.c-contact-actions__link:hover,
+.c-content .c-contact-actions__link:hover {
+  border-color: var(--color-fairway);
+  color: var(--color-surface);
+  background: var(--color-fairway);
+  transform: translateY(-1px);
+}
+
+.c-inline-contact {
+  margin: 30px 0 22px;
+  padding: 22px 24px;
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-gold);
+  background: var(--color-panel);
+}
+
+.c-inline-contact__summary {
+  margin: 0;
+}
+
 .c-contact-form {
   padding: 28px;
   border: 1px solid var(--color-border);
@@ -895,6 +951,10 @@ textarea:focus-visible {
   text-align: center;
 }
 
+.c-sponsorship__payment-note p {
+  margin: 0;
+}
+
 .c-sponsorship__details {
   width: min(100%, var(--max-width));
   margin: 0 auto;
@@ -1144,6 +1204,21 @@ textarea:focus-visible {
   .c-contact-form,
   .c-contact__info {
     padding: 22px 18px;
+  }
+
+  .c-contact-actions,
+  .c-contact-actions--inline {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .c-contact-actions__link,
+  .c-content .c-contact-actions__link {
+    width: 100%;
+  }
+
+  .c-inline-contact {
+    padding: 20px 18px;
   }
 
   .c-results-cta {
