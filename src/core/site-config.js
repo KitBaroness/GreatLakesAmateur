@@ -287,6 +287,35 @@
     },
     footer: {
       copyright: '&copy; 2026 Michigan Players Golf Club. Great Lakes Amateur.'
+    },
+    developerSignature: {
+      enabled: true,
+      label: 'FlexNet Console Easter Egg',
+      jokes: [
+        'FlexNet loaded with zero build step and a frankly suspicious amount of confidence.',
+        'No node_modules folder was summoned. The fairway remains playable.',
+        'BEM classes walked this CSS in a straight line. Mostly.',
+        'The router is hash-based because server config had enough feelings already.',
+        'Vanilla JS showed up in golf shoes and asked where the framework went.',
+        'Inspect console unlocked: you found the tiny developer plaque behind the drywall.',
+        'If this layout shifts, pretend it was reading the green.',
+        'Tailwind is not here. Please leave utility-class confetti at the clubhouse.'
+      ],
+      signoffs: [
+        'Hydrate nothing. Question everything. ~Kit Baroness',
+        'May your cache be empty and your selectors obedient. ~Kit Baroness',
+        'Tell the DOM I said behave. ~Kit Baroness',
+        'Ship clean. Commit weird. ~Kit Baroness',
+        'I was here, the bundle was small, and the console snitched. ~Kit Baroness',
+        'Zero build step. Maximum side-eye. ~Kit Baroness',
+        'If the divs ask, I was never here. ~Kit Baroness',
+        'The CSS has boundaries. I am working on mine. ~Kit Baroness'
+      ],
+      styles: {
+        title: 'color:#f2c94c;background:#0f2b37;padding:4px 8px;border-radius:4px;font-weight:800;',
+        joke: 'color:#0f2b37;font-weight:700;',
+        signoff: 'color:#2f5d44;font-style:italic;font-weight:700;'
+      }
     }
   });
 
@@ -331,6 +360,13 @@
    * @returns {Object}
    */
   const getFooter = (config) => config.footer;
+
+  /**
+   * @pure
+   * @param {Object} config
+   * @returns {Object}
+   */
+  const getDeveloperSignature = (config) => config.developerSignature;
 
   /**
    * @pure
@@ -421,6 +457,7 @@
     getAssets,
     getCallsToAction,
     getFooter,
+    getDeveloperSignature,
     getPayments,
     getContact,
     getContactAction,

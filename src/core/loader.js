@@ -4,6 +4,56 @@ import { createRouter, getPathFromHash } from '../utilities/router.js';
 
 const bySelector = (selector) => document.querySelector(selector);
 const storagePrefix = 'flexnet:';
+let developerSignatureLogged = false;
+
+/**
+ * @param {Array} items
+ * @returns {*}
+ */
+const pickRandomItem = (items) => items[Math.floor(Math.random() * items.length)];
+
+/**
+ * @effect
+ * @param {Object} config
+ * @returns {void}
+ */
+const logDeveloperSignature = (config) => {
+  const signature = window.FlexNetSiteConfig?.getDeveloperSignature?.(config);
+
+  if (
+    developerSignatureLogged ||
+    !signature?.enabled ||
+    !Array.isArray(signature.jokes) ||
+    !Array.isArray(signature.signoffs) ||
+    !signature.jokes.length ||
+    !signature.signoffs.length ||
+    !window.console ||
+    typeof window.console.info !== 'function'
+  ) {
+    return;
+  }
+
+  developerSignatureLogged = true;
+
+  const joke = pickRandomItem(signature.jokes);
+  const signoff = pickRandomItem(signature.signoffs);
+  const styles = signature.styles || {};
+  const title = signature.label || 'FlexNet Console Easter Egg';
+  const canGroup = typeof window.console.group === 'function' && typeof window.console.groupEnd === 'function';
+
+  if (canGroup) {
+    window.console.group(`%c${title}`, styles.title || '');
+  } else {
+    window.console.info(title);
+  }
+
+  window.console.info(`%c${joke}`, styles.joke || '');
+  window.console.info(`%c${signoff}`, styles.signoff || '');
+
+  if (canGroup) {
+    window.console.groupEnd();
+  }
+};
 
 /**
  * @effect
@@ -325,6 +375,7 @@ const initializeApp = () => {
     return;
   }
 
+  logDeveloperSignature(config);
   renderHeader(config, getPathFromHash());
   renderFooter(config);
   bindGlobalInteractions(config);

@@ -65,7 +65,7 @@ Browser-controlled HTTP cache, mail client drafts, SMS drafts, autofill systems,
 
 ## Functional Structure
 
-- `src/core/site-config.js`: Frozen site data, payment/contact config, and pure query helpers.
+- `src/core/site-config.js`: Frozen site data, payment/contact/developer-signature config, and pure query helpers.
 - `src/core/loader.js`: Runtime bootstrap and browser side effects.
 - `src/core/layout/renderHeader.js`: Pure header rendering.
 - `src/core/layout/renderFooter.js`: Pure footer rendering.
@@ -87,7 +87,7 @@ The visual theme is tuned for a professional amateur golf event in Great Lakes M
 
 | Route | View | Description |
 |------|------|-------------|
-| `#/home` | `public/views/home/index.html` | Home page with tournament hero, dates, entry fee, and payment actions |
+| `#/home` | `public/views/home/index.html` | Home page with tournament hero, dates, and highlighted entry fee |
 | `#/event-details` | `public/views/event-details/index.html` | Tournament details, schedule, prizes, course info, entry fee, and scoring link |
 | `#/contact` | `public/views/contact/index.html` | Contact form plus call, text, and email actions |
 | `#/upcoming-events` | `public/views/upcoming-events/index.html` | Upcoming events listing |
@@ -128,6 +128,7 @@ For automatic form email delivery, add a backend endpoint such as a Cloudflare P
 - **Styles**: Edit BEM components in `css/styles.css`.
 - **Payments**: Edit the `payments` object in `src/core/site-config.js`.
 - **Contact actions**: Edit the `contact` object in `src/core/site-config.js`.
+- **Console easter egg**: Edit the `developerSignature` object in `src/core/site-config.js`.
 
 ## Source
 
