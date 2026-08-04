@@ -39,15 +39,99 @@ const toggleMobileNavigation = () => {
 
 /**
  * @effect
+ * @param {HTMLAnchorElement} link
+ * @param {Object} payment
+ * @returns {void}
+ */
+const hydratePaymentLink = (link, payment) => {
+  const url = payment.checkoutUrl;
+  const label = payment.checkoutLabel || payment.label;
+  const title = `${label} - ${payment.label} ${payment.amount}`.trim();
+  const isExternalPage = payment.external && /^https?:\/\//i.test(url);
+
+  link.setAttribute('href', url);
+  link.setAttribute('title', title);
+  link.setAttribute('aria-label', title);
+  link.setAttribute('data-payment-status', 'ready');
+
+  if (isExternalPage) {
+    link.setAttribute('target', '_blank');
+    link.setAttribute('rel', 'noopener noreferrer');
+  } else {
+    link.removeAttribute('target');
+    link.removeAttribute('rel');
+  }
+
+  const labelTarget = link.querySelector('[data-payment-label-target]');
+  const image = link.querySelector('img');
+
+  if (labelTarget) {
+    labelTarget.textContent = label;
+  } else if (!image && label) {
+    link.textContent = label;
+  }
+
+  if (image) {
+    image.setAttribute('alt', label);
+  }
+};
+
+/**
+ * @effect
+ * @param {HTMLAnchorElement} link
+ * @returns {void}
+ */
+const markPaymentLinkUnconfigured = (link) => {
+  link.setAttribute('href', '#');
+  link.setAttribute('data-payment-status', 'unconfigured');
+  link.removeAttribute('target');
+  link.removeAttribute('rel');
+};
+
+/**
+ * @effect
+ * @param {Object} config
+ * @returns {void}
+ */
+const hydratePaymentLinks = (config) => {
+  const getPaymentOption = window.FlexNetSiteConfig?.getPaymentOption;
+
+  document.querySelectorAll('[data-payment-key]').forEach((link) => {
+    const key = link.getAttribute('data-payment-key');
+    const payment = getPaymentOption ? getPaymentOption(config, key) : null;
+
+    if (payment?.checkoutUrl) {
+      hydratePaymentLink(link, payment);
+      return;
+    }
+
+    markPaymentLinkUnconfigured(link);
+  });
+};
+
+/**
+ * @pure
+ * @param {HTMLElement} trigger
+ * @param {Object} config
+ * @returns {Object|null}
+ */
+const getPaymentForTrigger = (trigger, config) => {
+  const key = trigger.getAttribute('data-payment-key');
+  return key ? window.FlexNetSiteConfig?.getPaymentOption(config, key) : null;
+};
+
+/**
+ * @effect
  * @param {HTMLElement} trigger
  * @returns {void}
  */
-const handlePlaceholderPayment = (trigger, config) => {
-  const label = trigger.getAttribute('data-payment-label') || 'Payment';
+const handlePaymentFallback = (trigger, config) => {
+  const configuredPayment = getPaymentForTrigger(trigger, config);
+  const label = configuredPayment?.label || trigger.getAttribute('data-payment-label') || 'Payment';
   const payment = window.FlexNetSiteConfig?.getPayments(config);
   const message = payment
     ? `${label} ${payment.fallbackMessage} Phone: ${payment.fallbackPhone}. Email: ${payment.fallbackEmail}.`
-    : `${label} payment link is not configured yet.`;
+    : `${label} checkout link is not configured yet.`;
 
   window.alert(message);
 };
@@ -58,10 +142,16 @@ const handlePlaceholderPayment = (trigger, config) => {
  */
 const bindGlobalInteractions = (config) => {
   document.addEventListener('click', (event) => {
-    const paymentTrigger = event.target.closest('[data-payment-placeholder]');
+    const paymentTrigger = event.target.closest('[data-payment-key], [data-payment-placeholder]');
     if (paymentTrigger) {
+      const configuredPayment = getPaymentForTrigger(paymentTrigger, config);
+
+      if (configuredPayment?.checkoutUrl && paymentTrigger.getAttribute('href') !== '#') {
+        return;
+      }
+
       event.preventDefault();
-      handlePlaceholderPayment(paymentTrigger, config);
+      handlePaymentFallback(paymentTrigger, config);
       return;
     }
 
@@ -107,10 +197,12 @@ const initializeApp = () => {
   renderHeader(config, getPathFromHash());
   renderFooter(config);
   bindGlobalInteractions(config);
+  hydratePaymentLinks(config);
 
   window.addEventListener('routechange', (event) => {
     renderHeader(config, event.detail.path);
     closeMobileNavigation();
+    hydratePaymentLinks(config);
   });
 
   window.FlexNetApp = createRouter(config, {

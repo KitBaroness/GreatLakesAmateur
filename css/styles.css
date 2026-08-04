@@ -884,10 +884,21 @@ textarea:focus-visible {
   transform: translateY(-1px);
 }
 
+.c-sponsorship__payment-note {
+  width: min(100%, var(--max-width));
+  margin: 0 auto;
+  padding: 26px 24px 0;
+  color: var(--color-muted);
+  font-size: 0.96rem;
+  font-weight: 550;
+  line-height: 1.55;
+  text-align: center;
+}
+
 .c-sponsorship__details {
   width: min(100%, var(--max-width));
   margin: 0 auto;
-  padding: 72px 24px 80px;
+  padding: 46px 24px 80px;
 }
 
 .c-sponsorship__heading {

@@ -19,6 +19,27 @@
     return Object.freeze(value);
   };
 
+  const paymentContact = {
+    phone: '330-990-7738',
+    email: 'yipper.rmy@gmail.com'
+  };
+
+  /**
+   * @pure
+   * @param {Object} params
+   * @returns {String}
+   */
+  const buildSponsorInvoiceLink = ({ label, amount }) => {
+    const subject = `${label} Invoice Request`;
+    const body = [
+      `I would like to sponsor the Great Lakes Amateur as the ${label} for ${amount}.`,
+      '',
+      'Please send payment instructions and sponsorship next steps.'
+    ].join('\n');
+
+    return `mailto:${paymentContact.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+
   const siteConfig = deepFreeze({
     version: '2.0.0',
     brand: {
@@ -83,9 +104,77 @@
       }
     ],
     payments: {
-      fallbackPhone: '330-990-7738',
-      fallbackEmail: 'yipper.rmy@gmail.com',
-      fallbackMessage: 'payment link is not configured yet. Please contact Ryan Yip for payment options.'
+      fallbackPhone: paymentContact.phone,
+      fallbackEmail: paymentContact.email,
+      fallbackMessage: 'checkout link is not configured yet. Please contact Ryan Yip for payment options.',
+      providerNotes: {
+        wixAppId: 'cdd4b6d5-6fb4-4bd1-9189-791244b5361e',
+        wixOrderEndpoint: 'https://www.michiganplayersgolfclub.com/_api/payment-paybutton-web/paybutton/v2/orders',
+        note: 'Wix Pay creates orders inside the Wix runtime and does not expose product IDs as direct checkout URLs.'
+      },
+      entryFee: {
+        key: 'entryFee',
+        label: 'Great Lakes Amateur Entry Fee',
+        amount: '$299',
+        checkoutLabel: 'Pay Entry Fee',
+        checkoutUrl: 'https://www.michiganplayersgolfclub.com/event-details',
+        provider: 'Wix Pay Button',
+        external: true,
+        productIds: {
+          home: 'fd8b841c-2648-4b24-96b2-eb33e37890dd',
+          eventDetails: 'e3f799b1-ef40-458c-a316-c540b2c84922'
+        }
+      },
+      sponsorships: {
+        titleSponsor: {
+          key: 'titleSponsor',
+          label: 'Tournament and Website Title Sponsor',
+          amount: '$3,000',
+          checkoutLabel: 'Request Sponsor Invoice',
+          checkoutUrl: buildSponsorInvoiceLink({
+            label: 'Tournament and Website Title Sponsor',
+            amount: '$3,000'
+          }),
+          provider: 'Email invoice request',
+          external: false
+        },
+        lunchSponsor: {
+          key: 'lunchSponsor',
+          label: 'Great Lakes Amateur Lunch Sponsor',
+          amount: '$1,000',
+          checkoutLabel: 'Request Sponsor Invoice',
+          checkoutUrl: buildSponsorInvoiceLink({
+            label: 'Great Lakes Amateur Lunch Sponsor',
+            amount: '$1,000'
+          }),
+          provider: 'Email invoice request',
+          external: false
+        },
+        puttingGreenSponsor: {
+          key: 'puttingGreenSponsor',
+          label: 'Great Lakes Amateur Putting Green Sponsor',
+          amount: '$1,000',
+          checkoutLabel: 'Request Sponsor Invoice',
+          checkoutUrl: buildSponsorInvoiceLink({
+            label: 'Great Lakes Amateur Putting Green Sponsor',
+            amount: '$1,000'
+          }),
+          provider: 'Email invoice request',
+          external: false
+        },
+        drivingRangeSponsor: {
+          key: 'drivingRangeSponsor',
+          label: 'Great Lakes Amateur Driving Range Sponsor',
+          amount: '$1,000',
+          checkoutLabel: 'Request Sponsor Invoice',
+          checkoutUrl: buildSponsorInvoiceLink({
+            label: 'Great Lakes Amateur Driving Range Sponsor',
+            amount: '$1,000'
+          }),
+          provider: 'Email invoice request',
+          external: false
+        }
+      }
     },
     footer: {
       copyright: '&copy; 2026 Michigan Players Golf Club. Great Lakes Amateur.'
@@ -144,6 +233,23 @@
   /**
    * @pure
    * @param {Object} config
+   * @param {String} key
+   * @returns {Object|null}
+   */
+  const getPaymentOption = (config, key) => {
+    const payments = getPayments(config);
+    const sponsorships = payments.sponsorships || {};
+    const options = [
+      payments.entryFee,
+      ...Object.keys(sponsorships).map((sponsorshipKey) => sponsorships[sponsorshipKey])
+    ].filter(Boolean);
+
+    return options.find((option) => option.key === key) || null;
+  };
+
+  /**
+   * @pure
+   * @param {Object} config
    * @returns {Array}
    */
   const buildRoutes = (config) => {
@@ -189,6 +295,7 @@
     getCallsToAction,
     getFooter,
     getPayments,
+    getPaymentOption,
     buildRoutes,
     findPageByRoute
   });

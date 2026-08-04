@@ -85,7 +85,7 @@ Then visit `http://localhost:8080/index.html#/home`.
 - **Page content**: Edit the matching file under `public/views/`.
 - **Shared layout**: Edit `src/core/layout/renderHeader.js` or `src/core/layout/renderFooter.js`.
 - **Styles**: Edit BEM components in `css/styles.css`.
-- **Pay Now button**: Currently links to `#`. Replace with your payment URL in the home and event-details view fragments.
+- **Payment links**: Payment behavior is centralized in `src/core/site-config.js`. The entry fee currently opens the original Wix event-details payment page because Wix Pay creates checkout orders inside the Wix runtime. Sponsorship buttons use invoice request email links because the original Wix sponsorship page does not expose direct sponsor checkout endpoints.
 - **Contact form**: Submits to a placeholder alert in `src/core/loader.js`.
 - **Copy**: Tournament copy has been normalized for a professional amateur golf audience while preserving the original event details.
 
