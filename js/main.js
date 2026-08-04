@@ -1,27 +1,20 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const menuToggle = document.querySelector('.menu-toggle');
-  const navMobile = document.querySelector('.nav-mobile');
+// Legacy page bridge.
+// The FlexNet runtime now lives in /src and loads through index.html.
 
-  if (menuToggle && navMobile) {
-    menuToggle.addEventListener('click', () => {
-      menuToggle.classList.toggle('open');
-      navMobile.classList.toggle('open');
-    });
+(function () {
+  'use strict';
 
-    navMobile.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', () => {
-        menuToggle.classList.remove('open');
-        navMobile.classList.remove('open');
-      });
-    });
+  const routeByFile = Object.freeze({
+    'contact.html': '/contact',
+    'event-details.html': '/event-details',
+    'sponsorship.html': '/sponsorship',
+    'upcoming-events.html': '/upcoming-events'
+  });
+
+  const currentFile = window.location.pathname.split('/').pop();
+  const route = routeByFile[currentFile];
+
+  if (route) {
+    window.location.replace(`index.html#${route}`);
   }
-
-  const contactForm = document.getElementById('contact-form');
-  if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      alert('Thank you for your message! (Form submission is not yet configured.)');
-      contactForm.reset();
-    });
-  }
-});
+})();
