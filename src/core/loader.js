@@ -3,6 +3,53 @@ import { renderFooter } from './layout/renderFooter.js';
 import { createRouter, getPathFromHash } from '../utilities/router.js';
 
 const bySelector = (selector) => document.querySelector(selector);
+const storagePrefix = 'flexnet:';
+
+/**
+ * @effect
+ * @param {String} storageName
+ * @returns {void}
+ */
+const clearOwnedStorage = (storageName) => {
+  try {
+    const storage = window[storageName];
+    if (!storage) return;
+
+    for (let index = storage.length - 1; index >= 0; index -= 1) {
+      const key = storage.key(index);
+
+      if (key?.startsWith(storagePrefix)) {
+        storage.removeItem(key);
+      }
+    }
+  } catch {
+    // Private browsing modes can block Storage APIs; no visitor data is written by default.
+  }
+};
+
+/**
+ * @effect
+ * @returns {void}
+ */
+const resetTransientForms = () => {
+  document.querySelectorAll('[data-transient-form]').forEach((form) => {
+    form.reset();
+
+    form.querySelectorAll('input, textarea').forEach((control) => {
+      control.value = '';
+    });
+  });
+};
+
+/**
+ * @effect
+ * @returns {void}
+ */
+const purgeTransientVisitorState = () => {
+  resetTransientForms();
+  clearOwnedStorage('sessionStorage');
+  clearOwnedStorage('localStorage');
+};
 
 /**
  * @effect
@@ -245,7 +292,23 @@ const bindGlobalInteractions = (config) => {
     if (!form) return;
 
     event.preventDefault();
-    window.location.href = buildContactFormMailto(config, form);
+    const mailto = buildContactFormMailto(config, form);
+    purgeTransientVisitorState();
+    window.location.href = mailto;
+  });
+};
+
+/**
+ * @effect
+ * @returns {void}
+ */
+const bindSessionPrivacyGuards = () => {
+  window.addEventListener('pagehide', purgeTransientVisitorState);
+  window.addEventListener('beforeunload', purgeTransientVisitorState);
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+      purgeTransientVisitorState();
+    }
   });
 };
 
@@ -264,6 +327,7 @@ const initializeApp = () => {
   renderHeader(config, getPathFromHash());
   renderFooter(config);
   bindGlobalInteractions(config);
+  bindSessionPrivacyGuards();
   hydratePaymentLinks(config);
   hydrateContactLinks(config);
 

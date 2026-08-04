@@ -48,6 +48,21 @@ Security boundaries still matter:
 - Any future automatic email delivery, payment checkout, or sponsor payment flow should use a secure backend endpoint such as a Cloudflare Pages Function with environment variables.
 - Any server-side endpoint should validate inputs, rate limit submissions, avoid exposing secrets, and return only the minimum response data needed by the browser.
 
+## Session Privacy And Cache Controls
+
+The site is designed to avoid leaving visitor-entered data behind after a session:
+
+- The contact form uses `autocomplete="off"` and is marked as transient form state.
+- The FlexNet loader clears transient form fields when the form opens the prefilled email handoff.
+- The FlexNet loader clears transient form fields on `pagehide` and `beforeunload`.
+- The FlexNet loader clears any app-owned `localStorage` or `sessionStorage` keys that use the `flexnet:` prefix.
+- The app does not intentionally store visitor form input in browser storage.
+- Cloudflare Pages cache rules in `_headers` mark HTML pages and `public/views/` fragments as `no-store`.
+- Runtime JavaScript is marked for revalidation so stale runtime behavior is less likely after deployment.
+- Static images and CSS may still be cached because they do not contain visitor-entered data.
+
+Browser-controlled HTTP cache, mail client drafts, SMS drafts, autofill systems, and operating-system level caches cannot be fully erased by frontend JavaScript. Sensitive workflows that require guaranteed data disposal should be handled by a secure backend endpoint with explicit retention controls.
+
 ## Functional Structure
 
 - `src/core/site-config.js`: Frozen site data, payment/contact config, and pure query helpers.
