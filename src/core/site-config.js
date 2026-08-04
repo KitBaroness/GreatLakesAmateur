@@ -232,8 +232,11 @@
         amount: '$299',
         checkoutLabel: 'Pay Entry Fee',
         checkoutUrl: 'https://www.michiganplayersgolfclub.com/event-details',
-        provider: 'Wix Pay Button',
-        external: true,
+        checkoutMode: 'iframe',
+        iframeUrl: 'https://www.michiganplayersgolfclub.com/event-details#comp-m9skg2mt',
+        iframeTitle: 'Great Lakes Amateur Entry Fee Checkout',
+        provider: 'Wix Pay Button iframe',
+        external: false,
         productIds: {
           home: 'fd8b841c-2648-4b24-96b2-eb33e37890dd',
           eventDetails: 'e3f799b1-ef40-458c-a316-c540b2c84922'

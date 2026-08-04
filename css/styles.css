@@ -78,6 +78,10 @@ textarea:focus-visible {
   flex-direction: column;
 }
 
+.c-app--modal-open {
+  overflow: hidden;
+}
+
 .c-app__main {
   flex: 1;
   outline: none;
@@ -418,6 +422,95 @@ textarea:focus-visible {
 
 .c-payment-options__alternate:hover {
   color: var(--color-fairway-strong);
+}
+
+.c-payment-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  padding: 22px;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 43, 55, 0.76);
+}
+
+.c-payment-modal[hidden] {
+  display: none;
+}
+
+.c-payment-modal__dialog {
+  display: flex;
+  width: min(100%, 1080px);
+  height: min(92vh, 820px);
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 6px;
+  background: var(--color-surface);
+  box-shadow: 0 28px 80px rgba(15, 43, 55, 0.38);
+}
+
+.c-payment-modal__header,
+.c-payment-modal__footer {
+  display: flex;
+  min-height: 58px;
+  padding: 12px 16px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-panel);
+}
+
+.c-payment-modal__footer {
+  min-height: 52px;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 0;
+  justify-content: flex-end;
+}
+
+.c-payment-modal__title {
+  margin: 0;
+  color: var(--color-lake);
+  font-family: var(--font-heading);
+  font-size: 1.28rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.c-payment-modal__close,
+.c-payment-modal__fallback {
+  display: inline-flex;
+  min-height: 38px;
+  padding: 8px 14px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-lake);
+  border-radius: 4px;
+  color: var(--color-lake);
+  background: var(--color-surface);
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.2;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.c-payment-modal__close:hover,
+.c-payment-modal__fallback:hover {
+  border-color: var(--color-fairway);
+  color: var(--color-surface);
+  background: var(--color-fairway);
+  transform: translateY(-1px);
+}
+
+.c-payment-modal__frame {
+  width: 100%;
+  flex: 1;
+  border: 0;
+  background: var(--color-surface);
 }
 
 .c-event-strip {
@@ -1187,6 +1280,33 @@ textarea:focus-visible {
 
   .c-pay-link--compact .c-pay-link__image {
     width: 210px;
+  }
+
+  .c-payment-modal {
+    padding: 8px;
+  }
+
+  .c-payment-modal__dialog {
+    width: 100%;
+    height: calc(100vh - 16px);
+    border-radius: 4px;
+  }
+
+  .c-payment-modal__header,
+  .c-payment-modal__footer {
+    min-height: 52px;
+    padding: 10px 12px;
+  }
+
+  .c-payment-modal__title {
+    font-size: 1.05rem;
+  }
+
+  .c-payment-modal__close,
+  .c-payment-modal__fallback {
+    min-height: 36px;
+    padding: 8px 10px;
+    font-size: 12px;
   }
 
   .c-page-header {
