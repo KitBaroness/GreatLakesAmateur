@@ -38,21 +38,9 @@ const logDeveloperSignature = (config) => {
   const joke = pickRandomItem(signature.jokes);
   const signoff = pickRandomItem(signature.signoffs);
   const styles = signature.styles || {};
-  const title = signature.label || 'FlexNet Console Easter Egg';
-  const canGroup = typeof window.console.group === 'function' && typeof window.console.groupEnd === 'function';
-
-  if (canGroup) {
-    window.console.group(`%c${title}`, styles.title || '');
-  } else {
-    window.console.info(title);
-  }
 
   window.console.info(`%c${joke}`, styles.joke || '');
   window.console.info(`%c${signoff}`, styles.signoff || '');
-
-  if (canGroup) {
-    window.console.groupEnd();
-  }
 };
 
 /**

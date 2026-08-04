@@ -290,7 +290,6 @@
     },
     developerSignature: {
       enabled: true,
-      label: 'FlexNet Console Easter Egg',
       jokes: [
         'FlexNet loaded with zero build step and a frankly suspicious amount of confidence.',
         'No node_modules folder was summoned. The fairway remains playable.',
@@ -312,9 +311,8 @@
         'The CSS has boundaries. I am working on mine. ~Kit Baroness'
       ],
       styles: {
-        title: 'color:#f2c94c;background:#0f2b37;padding:4px 8px;border-radius:4px;font-weight:800;',
-        joke: 'color:#0f2b37;font-weight:700;',
-        signoff: 'color:#2f5d44;font-style:italic;font-weight:700;'
+        joke: 'color:#0f2b37;background:#f8f6ef;border:1px solid #b9904d;padding:3px 7px;border-radius:4px;font-weight:800;line-height:1.6;',
+        signoff: 'color:#f8f6ef;background:#173a4a;border:1px solid #b9904d;padding:3px 7px;border-radius:4px;font-style:italic;font-weight:800;line-height:1.6;'
       }
     }
   });
