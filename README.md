@@ -113,7 +113,7 @@ http://localhost:8080/index.html#/home
 
 Payment and contact behavior is centralized in `src/core/site-config.js`.
 
-- Entry fee: opens the original Wix event-details payment page because Wix Pay creates checkout orders inside the Wix runtime.
+- Entry fee: all entry-fee payment actions open the original Wix event-details payment page because Wix Pay creates checkout orders inside the Wix runtime.
 - Sponsorships: use invoice request email links because the original Wix sponsorship page does not expose direct sponsor checkout endpoints.
 - Call/text/email: mobile-friendly `tel:`, `sms:`, and prefilled `mailto:` links are generated from config.
 - Contact form: opens a prefilled `mailto:` message. It does not send server-side email by itself.

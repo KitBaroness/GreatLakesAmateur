@@ -356,6 +356,27 @@ textarea:focus-visible {
   color: var(--color-lake);
 }
 
+.c-home-hero__fee-link {
+  display: inline-flex;
+  min-height: 42px;
+  padding: 9px 18px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-lake);
+  border-radius: 4px;
+  color: var(--color-lake);
+  background: var(--color-panel);
+  text-decoration: none;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.c-home-hero__fee-link:hover {
+  border-color: var(--color-fairway);
+  color: var(--color-surface);
+  background: var(--color-fairway);
+  transform: translateY(-1px);
+}
+
 .c-pay-link {
   display: inline-block;
   transition: opacity 160ms ease, transform 160ms ease;
@@ -523,6 +544,30 @@ textarea:focus-visible {
   margin: 0 auto 22px;
   color: var(--color-muted);
   font-size: 1rem;
+}
+
+.c-event-meta__fee-link {
+  display: inline-flex;
+  min-height: 38px;
+  margin: 0 6px 6px 0;
+  padding: 8px 14px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-lake);
+  border-radius: 4px;
+  color: var(--color-lake);
+  background: var(--color-surface);
+  font-weight: 750;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.c-event-meta__fee-link:hover {
+  border-color: var(--color-fairway);
+  color: var(--color-surface);
+  background: var(--color-fairway);
+  transform: translateY(-1px);
 }
 
 .c-results-cta {

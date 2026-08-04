@@ -111,10 +111,11 @@ const hydratePaymentLink = (link, payment) => {
 
   const labelTarget = link.querySelector('[data-payment-label-target]');
   const image = link.querySelector('img');
+  const shouldPreserveLabel = link.hasAttribute('data-payment-preserve-label');
 
   if (labelTarget) {
     labelTarget.textContent = label;
-  } else if (!image && label) {
+  } else if (!image && label && !shouldPreserveLabel) {
     link.textContent = label;
   }
 
