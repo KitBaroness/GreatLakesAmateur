@@ -1,14 +1,35 @@
-# Michigan Players Golf Club - FlexNet Vanilla JS Site
+# GreatLakesAmateur - FlexNet JSX Vanilla JS Site
 
-A local, editable replica of [michiganplayersgolfclub.com](https://www.michiganplayersgolfclub.com/) converted from duplicated static pages into a FlexNet-style vanilla JavaScript app.
+This repository is a static replication of [michiganplayersgolfclub.com](https://www.michiganplayersgolfclub.com/) converted into a FlexNet JSX architecture for the Michigan Players Golf Club and Great Lakes Amateur tournament site.
 
-The app uses:
+FlexNet JSX was created by `@KitBaroness`. Questions about the FlexNet architecture can be commented to her.
 
-- Immutable `siteConfig` data frozen with `Object.freeze()`
-- Pure render functions for header/footer/page routing
-- Browser-native hash routing with `fetch()` and `DOMParser`
+## Architecture
+
+This project intentionally uses:
+
+- FlexNet JSX architecture
+- Pure vanilla browser JavaScript
+- Functional JavaScript patterns with immutable config and pure helper functions
+- No Node production runtime
+- No Node build step
+- No Tailwind CSS
+- No frontend package dependency
+- BEM CSS in `css/styles.css`
+- Browser-native routing with `fetch()`, `DOMParser`, and hash routes
 - Static HTML view fragments in `public/views/`
-- Custom BEM CSS only, with no Tailwind or frontend package dependencies
+
+The `example/` folder is reference material for FlexNet JSX architecture only. Do not edit `example/` when changing this site.
+
+## Functional Structure
+
+- `src/core/site-config.js`: Frozen site data, payment/contact config, and pure query helpers.
+- `src/core/loader.js`: Runtime bootstrap and browser side effects.
+- `src/core/layout/renderHeader.js`: Pure header rendering.
+- `src/core/layout/renderFooter.js`: Pure footer rendering.
+- `src/utilities/router.js`: Browser-native hash router and view loader.
+- `public/views/`: Static page fragments loaded by the router.
+- `css/styles.css`: BEM component styling only.
 
 ## Design System
 
@@ -24,60 +45,38 @@ The visual theme is tuned for a professional amateur golf event in Great Lakes M
 
 | Route | View | Description |
 |------|------|-------------|
-| `#/home` | `public/views/home/index.html` | Home - tournament hero, dates, entry fee, Pay Now |
-| `#/event-details` | `public/views/event-details/index.html` | Full tournament info, schedule, prizes, course details |
-| `#/contact` | `public/views/contact/index.html` | Contact form and tournament committee info |
+| `#/home` | `public/views/home/index.html` | Home page with tournament hero, dates, entry fee, and payment actions |
+| `#/event-details` | `public/views/event-details/index.html` | Tournament details, schedule, prizes, course info, entry fee, and scoring link |
+| `#/contact` | `public/views/contact/index.html` | Contact form plus call, text, and email actions |
 | `#/upcoming-events` | `public/views/upcoming-events/index.html` | Upcoming events listing |
-| `#/sponsorship` | `public/views/sponsorship/index.html` | Sponsorship opportunities placeholder |
+| `#/sponsorship` | `public/views/sponsorship/index.html` | Sponsorship tiers, benefits, and invoice inquiry actions |
 
-The old top-level page URLs (`contact.html`, `event-details.html`, `upcoming-events.html`, `sponsorship.html`) are now redirect shells into the SPA.
-
-## Project Structure
-
-```
-Ryan_Golf/
-├── index.html                  # FlexNet SPA entry point
-├── contact.html                # Legacy redirect shell
-├── event-details.html          # Legacy redirect shell
-├── sponsorship.html            # Legacy redirect shell
-├── upcoming-events.html        # Legacy redirect shell
-├── css/
-│   └── styles.css              # BEM component CSS
-├── js/
-│   └── main.js                 # Legacy redirect bridge
-├── src/
-│   ├── core/
-│   │   ├── site-config.js      # Frozen config and pure query helpers
-│   │   ├── loader.js           # Runtime bootstrap
-│   │   └── layout/
-│   │       ├── renderFooter.js
-│   │       └── renderHeader.js
-│   └── utilities/
-│       └── router.js           # Hash router and view loader
-├── public/
-│   └── views/
-│       ├── contact/
-│       ├── event-details/
-│       ├── home/
-│       ├── sponsorship/
-│       └── upcoming-events/
-└── assets/
-    └── images/
-        ├── logo.jpg
-        ├── hero.jpeg
-        ├── sidebar.jpg
-        └── pay-button.png
-```
+The old top-level URLs (`contact.html`, `event-details.html`, `upcoming-events.html`, `sponsorship.html`) are redirect shells into the FlexNet SPA.
 
 ## Local Preview
 
-Run a local static server from the repo root. A server is required because the FlexNet router fetches view fragments from `public/views/`.
+Run a local static server from the repo root. A server is required because the router fetches view fragments from `public/views/`.
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Then visit `http://localhost:8080/index.html#/home`.
+Then visit:
+
+```text
+http://localhost:8080/index.html#/home
+```
+
+## Payments And Contact
+
+Payment and contact behavior is centralized in `src/core/site-config.js`.
+
+- Entry fee: opens the original Wix event-details payment page because Wix Pay creates checkout orders inside the Wix runtime.
+- Sponsorships: use invoice request email links because the original Wix sponsorship page does not expose direct sponsor checkout endpoints.
+- Call/text/email: mobile-friendly `tel:`, `sms:`, and prefilled `mailto:` links are generated from config.
+- Contact form: opens a prefilled `mailto:` message. It does not send server-side email by itself.
+
+For automatic form email delivery, add a backend endpoint such as a Cloudflare Pages Function with an email provider API key.
 
 ## Customization Notes
 
@@ -85,11 +84,9 @@ Then visit `http://localhost:8080/index.html#/home`.
 - **Page content**: Edit the matching file under `public/views/`.
 - **Shared layout**: Edit `src/core/layout/renderHeader.js` or `src/core/layout/renderFooter.js`.
 - **Styles**: Edit BEM components in `css/styles.css`.
-- **Payment links**: Payment behavior is centralized in `src/core/site-config.js`. The entry fee currently opens the original Wix event-details payment page because Wix Pay creates checkout orders inside the Wix runtime. Sponsorship buttons use invoice request email links because the original Wix sponsorship page does not expose direct sponsor checkout endpoints.
-- **Contact links and form**: Call, text, and email actions are centralized in `src/core/site-config.js`; the contact form opens a prefilled `mailto:` message from `src/core/loader.js`.
-- **Copy**: Tournament copy has been normalized for a professional amateur golf audience while preserving the original event details.
+- **Payments**: Edit the `payments` object in `src/core/site-config.js`.
+- **Contact actions**: Edit the `contact` object in `src/core/site-config.js`.
 
 ## Source
 
-Replicated from the live site on August 3, 2026, then converted into a FlexNet-style vanilla JavaScript architecture.
-# GreatLakesAmateur
+Replicated from the live Wix site on August 3, 2026, then converted into a FlexNet JSX vanilla JavaScript architecture.
