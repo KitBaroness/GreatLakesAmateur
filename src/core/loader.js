@@ -4,7 +4,6 @@ import { createRouter, getPathFromHash } from '../utilities/router.js';
 
 const bySelector = (selector) => document.querySelector(selector);
 const storagePrefix = 'flexnet:';
-let paymentOverlayReturnFocus = null;
 
 /**
  * @effect
@@ -160,94 +159,6 @@ const hydratePaymentLinks = (config) => {
 
 /**
  * @effect
- * @returns {HTMLElement}
- */
-const createPaymentOverlay = () => {
-  const existingOverlay = bySelector('[data-payment-overlay]');
-  if (existingOverlay) return existingOverlay;
-
-  const overlay = document.createElement('section');
-  overlay.className = 'c-payment-modal';
-  overlay.hidden = true;
-  overlay.setAttribute('data-payment-overlay', '');
-  overlay.setAttribute('role', 'dialog');
-  overlay.setAttribute('aria-modal', 'true');
-  overlay.setAttribute('aria-labelledby', 'payment-modal-title');
-  overlay.innerHTML = `
-    <div class="c-payment-modal__dialog">
-      <header class="c-payment-modal__header">
-        <h2 class="c-payment-modal__title" id="payment-modal-title" data-payment-overlay-title>Checkout</h2>
-        <button class="c-payment-modal__close" type="button" data-payment-overlay-close>Close</button>
-      </header>
-      <iframe class="c-payment-modal__frame" title="Checkout" loading="eager" referrerpolicy="strict-origin-when-cross-origin" allow="payment; clipboard-write" data-payment-overlay-frame></iframe>
-      <footer class="c-payment-modal__footer">
-        <a class="c-payment-modal__fallback" href="#" target="_blank" rel="noopener noreferrer" data-payment-overlay-fallback>Open checkout in a new tab</a>
-      </footer>
-    </div>
-  `;
-
-  document.body.appendChild(overlay);
-  return overlay;
-};
-
-/**
- * @effect
- * @returns {void}
- */
-const closePaymentOverlay = () => {
-  const overlay = bySelector('[data-payment-overlay]');
-  if (!overlay || overlay.hidden) return;
-
-  const frame = overlay.querySelector('[data-payment-overlay-frame]');
-  overlay.hidden = true;
-  document.body.classList.remove('c-app--modal-open');
-
-  if (frame) {
-    frame.removeAttribute('src');
-  }
-
-  if (paymentOverlayReturnFocus) {
-    paymentOverlayReturnFocus.focus({ preventScroll: true });
-    paymentOverlayReturnFocus = null;
-  }
-};
-
-/**
- * @effect
- * @param {Object} payment
- * @param {HTMLElement} trigger
- * @returns {void}
- */
-const openPaymentOverlay = (payment, trigger) => {
-  const overlay = createPaymentOverlay();
-  const frame = overlay.querySelector('[data-payment-overlay-frame]');
-  const title = overlay.querySelector('[data-payment-overlay-title]');
-  const closeButton = overlay.querySelector('[data-payment-overlay-close]');
-  const fallback = overlay.querySelector('[data-payment-overlay-fallback]');
-  const iframeUrl = payment.iframeUrl || payment.checkoutUrl;
-
-  paymentOverlayReturnFocus = trigger;
-
-  if (title) {
-    title.textContent = payment.iframeTitle || `${payment.label} Checkout`;
-  }
-
-  if (frame) {
-    frame.setAttribute('title', payment.iframeTitle || payment.label);
-    frame.setAttribute('src', iframeUrl);
-  }
-
-  if (fallback) {
-    fallback.setAttribute('href', payment.checkoutUrl);
-  }
-
-  overlay.hidden = false;
-  document.body.classList.add('c-app--modal-open');
-  closeButton?.focus({ preventScroll: true });
-};
-
-/**
- * @effect
  * @param {HTMLAnchorElement} link
  * @param {Object} action
  * @returns {void}
@@ -351,12 +262,6 @@ const bindGlobalInteractions = (config) => {
     if (paymentTrigger) {
       const configuredPayment = getPaymentForTrigger(paymentTrigger, config);
 
-      if (configuredPayment?.checkoutMode === 'iframe' && configuredPayment?.iframeUrl) {
-        event.preventDefault();
-        openPaymentOverlay(configuredPayment, paymentTrigger);
-        return;
-      }
-
       if (configuredPayment?.checkoutUrl && paymentTrigger.getAttribute('href') !== '#') {
         return;
       }
@@ -375,19 +280,9 @@ const bindGlobalInteractions = (config) => {
     if (event.target.closest('.c-mobile-nav__link')) {
       closeMobileNavigation();
     }
-
-    if (event.target.closest('[data-payment-overlay-close]') || event.target === bySelector('[data-payment-overlay]')) {
-      event.preventDefault();
-      closePaymentOverlay();
-    }
   });
 
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && bySelector('[data-payment-overlay]')?.hidden === false) {
-      closePaymentOverlay();
-      return;
-    }
-
     if (event.key === 'Escape') {
       closeMobileNavigation();
     }

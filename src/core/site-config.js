@@ -220,27 +220,19 @@
     payments: {
       fallbackPhone: paymentContact.phone,
       fallbackEmail: paymentContact.email,
-      fallbackMessage: 'checkout link is not configured yet. Please contact Ryan Yip for payment options.',
+      fallbackMessage: 'online checkout is not configured. Please contact Ryan Yip for payment options.',
       providerNotes: {
-        wixAppId: 'cdd4b6d5-6fb4-4bd1-9189-791244b5361e',
-        wixOrderEndpoint: 'https://www.michiganplayersgolfclub.com/_api/payment-paybutton-web/paybutton/v2/orders',
-        note: 'Wix Pay creates orders inside the Wix runtime and does not expose product IDs as direct checkout URLs.'
+        note: 'Entry-fee checkout is intentionally not linked to the legacy Wix site. Visitor payment coordination should use the configured contact actions unless a dedicated checkout endpoint is added.'
       },
       entryFee: {
         key: 'entryFee',
         label: 'Great Lakes Amateur Entry Fee',
         amount: '$299',
-        checkoutLabel: 'Pay Entry Fee',
-        checkoutUrl: 'https://www.michiganplayersgolfclub.com/event-details',
-        checkoutMode: 'iframe',
-        iframeUrl: 'https://www.michiganplayersgolfclub.com/event-details#comp-m9skg2mt',
-        iframeTitle: 'Great Lakes Amateur Entry Fee Checkout',
-        provider: 'Wix Pay Button iframe',
-        external: false,
-        productIds: {
-          home: 'fd8b841c-2648-4b24-96b2-eb33e37890dd',
-          eventDetails: 'e3f799b1-ef40-458c-a316-c540b2c84922'
-        }
+        checkoutLabel: 'Entry Fee Inquiry',
+        checkoutUrl: '',
+        checkoutMode: 'contact',
+        provider: 'Contact coordination',
+        external: false
       },
       sponsorships: {
         titleSponsor: {

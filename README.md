@@ -44,8 +44,7 @@ Security boundaries still matter:
 - Do not store payment provider secrets, email API keys, private tokens, or credentials in frontend JavaScript.
 - `mailto:`, `sms:`, and `tel:` links open the visitor's local apps; they do not securely submit private data to a server.
 - The contact form currently opens a prefilled email and does not send server-side email by itself.
-- Wix checkout links depend on Wix runtime behavior and should not be treated as direct payment API endpoints.
-- The entry-fee checkout iframe depends on the original Wix event-details page remaining available at the configured Wix URL.
+- Online checkout is intentionally disabled until the site has a dedicated hosted checkout URL or a secure server-side payment endpoint.
 - Any future automatic email delivery, payment checkout, or sponsor payment flow should use a secure backend endpoint such as a Cloudflare Pages Function with environment variables.
 - Any server-side endpoint should validate inputs, rate limit submissions, avoid exposing secrets, and return only the minimum response data needed by the browser.
 
@@ -114,7 +113,7 @@ http://localhost:8080/index.html#/home
 
 Payment and contact behavior is centralized in `src/core/site-config.js`.
 
-- Entry fee: all entry-fee payment actions open a local FlexNet modal that embeds the original Wix event-details page in an iframe so the Wix Pay button/runtime can load without navigating away. The Wix URL remains as a no-JavaScript fallback.
+- Entry fee: the `$299 Entry Fee` is presented as highlighted fee information only. It does not open or embed the legacy Wix checkout.
 - Sponsorships: use invoice request email links because the original Wix sponsorship page does not expose direct sponsor checkout endpoints.
 - Call/text/email: mobile-friendly `tel:`, `sms:`, and prefilled `mailto:` links are generated from config.
 - Contact form: opens a prefilled `mailto:` message. It does not send server-side email by itself.
