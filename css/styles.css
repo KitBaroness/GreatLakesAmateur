@@ -30,6 +30,7 @@
 html {
   scroll-behavior: smooth;
   text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -39,8 +40,9 @@ body {
   background: var(--color-surface);
   font-family: var(--font-body);
   font-size: 16px;
-  font-weight: 350;
+  font-weight: 400;
   line-height: 1.65;
+  overflow-x: hidden;
 }
 
 img {
@@ -52,6 +54,28 @@ img {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body,
+button,
+input,
+textarea {
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+p,
+li,
+a,
+button {
+  overflow-wrap: break-word;
 }
 
 button,
@@ -85,6 +109,7 @@ textarea:focus-visible {
 
 .c-app__content {
   min-height: 58vh;
+  width: 100%;
 }
 
 .c-site-header {
@@ -111,6 +136,7 @@ textarea:focus-visible {
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
+  min-width: 0;
 }
 
 .c-site-header__logo {
@@ -120,10 +146,11 @@ textarea:focus-visible {
 
 .c-site-header__nav {
   display: flex;
+  flex: 1 1 auto;
   min-width: 0;
   align-items: center;
   justify-content: center;
-  gap: 18px;
+  gap: 16px;
 }
 
 .c-site-header__link {
@@ -133,6 +160,7 @@ textarea:focus-visible {
   font-weight: 650;
   line-height: 1.25;
   text-transform: uppercase;
+  white-space: nowrap;
   transition: color 160ms ease;
 }
 
@@ -165,6 +193,10 @@ textarea:focus-visible {
   flex: 0 0 auto;
   align-items: center;
   gap: 10px;
+}
+
+.c-site-header__actions .c-button {
+  white-space: nowrap;
 }
 
 .c-site-header__toggle {
@@ -238,6 +270,7 @@ textarea:focus-visible {
   font-size: 14px;
   font-weight: 700;
   line-height: 1.2;
+  text-align: center;
   cursor: pointer;
   transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, transform 160ms ease;
 }
@@ -275,7 +308,8 @@ textarea:focus-visible {
   width: min(100%, var(--max-width));
   min-height: 660px;
   margin: 0 auto;
-  grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+  grid-template-columns: minmax(240px, 34%) minmax(0, 1fr);
+  align-items: stretch;
 }
 
 .c-home-hero__sidebar {
@@ -291,6 +325,7 @@ textarea:focus-visible {
 .c-home-hero__content {
   position: relative;
   display: flex;
+  min-width: 0;
   padding: 54px 48px;
   flex-direction: column;
   align-items: center;
@@ -300,13 +335,16 @@ textarea:focus-visible {
 
 .c-home-hero__media {
   position: relative;
+  display: grid;
   width: min(100%, 430px);
   margin-bottom: 30px;
+  place-items: center;
 }
 
 .c-home-hero__image {
   width: 100%;
   max-height: 430px;
+  aspect-ratio: 1 / 1;
   object-fit: contain;
 }
 
@@ -352,7 +390,7 @@ textarea:focus-visible {
 }
 
 .c-home-hero__fee {
-  margin-bottom: 24px;
+  margin-bottom: 0;
   color: var(--color-lake);
 }
 
@@ -405,6 +443,7 @@ textarea:focus-visible {
   font-size: 3rem;
   font-weight: 650;
   line-height: 1.14;
+  text-wrap: balance;
 }
 
 .c-page-header__subtitle {
@@ -420,7 +459,7 @@ textarea:focus-visible {
   padding: 56px 24px 72px;
 }
 
-.c-content h2 {
+.c-content > h2 {
   margin: 38px 0 14px;
   padding-top: 18px;
   border-top: 1px solid var(--color-border);
@@ -431,14 +470,14 @@ textarea:focus-visible {
   line-height: 1.22;
 }
 
-.c-content h2:first-child,
+.c-content > h2:first-child,
 .c-event-meta + h2 {
   margin-top: 0;
   padding-top: 0;
   border-top: 0;
 }
 
-.c-content h3 {
+.c-content > h3 {
   margin: 28px 0 10px;
   color: var(--color-fairway-strong);
   font-family: var(--font-heading);
@@ -479,6 +518,7 @@ textarea:focus-visible {
   background: var(--color-panel);
   box-shadow: var(--shadow-soft);
   text-align: center;
+  overflow: hidden;
 }
 
 .c-event-meta__date {
@@ -491,8 +531,12 @@ textarea:focus-visible {
 }
 
 .c-event-meta__fee {
+  display: flex;
   max-width: 650px;
   margin: 0 auto 22px;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   color: var(--color-muted);
   font-size: 1rem;
 }
@@ -500,7 +544,6 @@ textarea:focus-visible {
 .c-event-meta__fee-badge {
   display: inline-flex;
   min-height: 38px;
-  margin: 0 6px 6px 0;
   padding: 8px 14px;
   align-items: center;
   justify-content: center;
@@ -511,6 +554,10 @@ textarea:focus-visible {
   font-weight: 750;
   line-height: 1.2;
   text-transform: uppercase;
+}
+
+.c-event-meta__fee-detail {
+  max-width: 560px;
 }
 
 .c-results-cta {
@@ -532,6 +579,8 @@ textarea:focus-visible {
 .c-results-cta__title {
   max-width: 420px;
   margin: 0 0 14px;
+  padding-top: 0;
+  border-top: 0;
   color: var(--color-lake-strong);
   font-family: var(--font-heading);
   font-size: 2.5rem;
@@ -649,6 +698,7 @@ textarea:focus-visible {
   font-size: 13px;
   font-weight: 750;
   line-height: 1.2;
+  text-align: center;
   text-decoration: none;
   text-transform: uppercase;
   transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
@@ -758,6 +808,7 @@ textarea:focus-visible {
 .c-activity {
   display: grid;
   grid-template-columns: minmax(280px, 0.92fr) minmax(0, 1.08fr);
+  align-items: stretch;
   overflow: hidden;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
@@ -791,6 +842,7 @@ textarea:focus-visible {
 
 .c-activity__body {
   display: flex;
+  min-width: 0;
   padding: 46px;
   flex-direction: column;
   justify-content: center;
@@ -833,6 +885,10 @@ textarea:focus-visible {
   gap: 12px;
 }
 
+.c-activity__actions .c-button {
+  flex: 0 1 auto;
+}
+
 .c-activity-highlights {
   margin: 10px 0 20px;
   padding: 22px 24px;
@@ -863,18 +919,23 @@ textarea:focus-visible {
 }
 
 .c-sponsorship__tier-band {
-  display: grid;
   padding: 72px 24px;
-  grid-template-columns: repeat(4, minmax(0, 280px));
-  justify-content: center;
-  gap: 22px;
   background:
     linear-gradient(135deg, rgba(23, 58, 74, 0.95), rgba(47, 93, 68, 0.88)),
     var(--color-lake);
 }
 
+.c-sponsorship__tier-grid {
+  display: grid;
+  width: min(100%, var(--max-width));
+  margin: 0 auto;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+
 .c-sponsorship__tier {
   display: flex;
+  min-width: 0;
   min-height: 190px;
   padding: 24px 18px;
   flex-direction: column;
@@ -894,6 +955,7 @@ textarea:focus-visible {
   font-size: 1.55rem;
   font-weight: 700;
   line-height: 1.16;
+  hyphens: auto;
 }
 
 .c-sponsorship__tier-price {
@@ -907,6 +969,7 @@ textarea:focus-visible {
 
 .c-sponsorship__pay-link {
   display: inline-flex;
+  width: min(100%, 220px);
   min-height: 36px;
   padding: 8px 16px;
   align-items: center;
@@ -918,6 +981,7 @@ textarea:focus-visible {
   font-size: 12px;
   font-weight: 750;
   line-height: 1.2;
+  text-align: center;
   text-transform: uppercase;
   transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
 }
@@ -966,6 +1030,7 @@ textarea:focus-visible {
 }
 
 .c-sponsorship__benefit {
+  min-width: 0;
   min-height: 320px;
   padding: 42px 24px 30px;
   border: 1px solid var(--color-border);
@@ -1032,7 +1097,7 @@ textarea:focus-visible {
   text-underline-offset: 3px;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1180px) {
   .c-site-header__inner {
     min-height: 76px;
   }
@@ -1063,7 +1128,7 @@ textarea:focus-visible {
     padding: 46px 28px;
   }
 
-  .c-sponsorship__tier-band,
+  .c-sponsorship__tier-grid,
   .c-sponsorship__benefits {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1132,7 +1197,7 @@ textarea:focus-visible {
     font-size: 2.05rem;
   }
 
-  .c-content h2 {
+  .c-content > h2 {
     font-size: 1.52rem;
   }
 
@@ -1221,6 +1286,9 @@ textarea:focus-visible {
 
   .c-sponsorship__tier-band {
     padding: 40px 18px;
+  }
+
+  .c-sponsorship__tier-grid {
     grid-template-columns: 1fr;
     gap: 18px;
   }
@@ -1245,6 +1313,88 @@ textarea:focus-visible {
   .c-sponsorship__tier,
   .c-sponsorship__benefit {
     min-height: auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .c-site-header__inner {
+    min-height: 68px;
+    padding: 8px 14px;
+  }
+
+  .c-site-header__logo {
+    height: 48px;
+  }
+
+  .c-site-header__toggle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .c-mobile-nav {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .c-home-hero__content {
+    padding: 30px 16px 36px;
+  }
+
+  .c-home-hero__media {
+    width: min(100%, 300px);
+  }
+
+  .c-home-hero__title {
+    font-size: 1.86rem;
+  }
+
+  .c-home-hero__subtitle {
+    font-size: 1.34rem;
+  }
+
+  .c-page-header {
+    padding: 38px 16px;
+  }
+
+  .c-page-header__title {
+    font-size: 1.78rem;
+  }
+
+  .c-content,
+  .c-contact,
+  .c-placeholder,
+  .c-activities,
+  .c-sponsorship__details {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .c-activity__body,
+  .c-activity-highlights,
+  .c-event-meta,
+  .c-contact-form,
+  .c-contact__info,
+  .c-inline-contact {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .c-results-cta__link {
+    gap: 10px;
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .c-results-cta__link-text {
+    letter-spacing: 0.18em;
+  }
+
+  .c-results-cta__link-line {
+    width: 26px;
+  }
+
+  .c-sponsorship__tier-band {
+    padding: 34px 14px;
   }
 }
 
