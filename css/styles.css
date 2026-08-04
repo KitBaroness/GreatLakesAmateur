@@ -37,7 +37,7 @@ body {
   margin: 0;
   min-height: 100vh;
   color: var(--color-ink);
-  background: var(--color-surface);
+  background: var(--color-lake-strong);
   font-family: var(--font-body);
   font-size: 16px;
   font-weight: 400;
@@ -103,12 +103,13 @@ textarea:focus-visible {
 }
 
 .c-app__main {
-  flex: 1;
+  flex: 0 0 auto;
+  background: var(--color-surface);
   outline: none;
 }
 
 .c-app__content {
-  min-height: 58vh;
+  min-height: 0;
   width: 100%;
 }
 
@@ -539,6 +540,7 @@ textarea:focus-visible {
   gap: 10px;
   color: var(--color-muted);
   font-size: 1rem;
+  text-align: center;
 }
 
 .c-event-meta__fee-badge {
@@ -639,6 +641,158 @@ textarea:focus-visible {
   margin: 0 0 36px;
   color: var(--color-muted);
   font-size: 1.04rem;
+}
+
+.c-location-map {
+  margin: 0 0 42px;
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--color-gold);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+  text-align: left;
+}
+
+.c-location-map__header {
+  padding: 26px 28px 20px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-panel);
+  text-align: center;
+}
+
+.c-location-map__eyebrow {
+  margin: 0 0 8px;
+  color: var(--color-gold);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.c-location-map__heading {
+  margin: 0;
+  color: var(--color-lake);
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  font-weight: 650;
+  line-height: 1.18;
+}
+
+.c-location-map__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  min-height: 460px;
+}
+
+.c-location-map__canvas {
+  min-height: 460px;
+  background: var(--color-soft);
+}
+
+.c-location-map__fallback {
+  display: grid;
+  min-height: 460px;
+  margin: 0;
+  place-items: center;
+  padding: 24px;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.c-location-map__locations {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  max-height: 460px;
+  overflow-y: auto;
+  padding: 18px;
+  border-left: 1px solid var(--color-border);
+  background: var(--color-panel);
+}
+
+.c-location-map__location {
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-fairway);
+  background: var(--color-surface);
+}
+
+.c-location-map__location--event {
+  border-left-color: var(--color-gold);
+}
+
+.c-location-map__location-label {
+  margin: 0 0 6px;
+  color: var(--color-gold);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.c-location-map__location-title {
+  margin: 0 0 8px;
+  color: var(--color-lake);
+  font-family: var(--font-heading);
+  font-size: 1.08rem;
+  font-weight: 700;
+  line-height: 1.22;
+}
+
+.c-location-map__location-address,
+.c-location-map__location-note {
+  margin: 0 0 8px;
+  color: var(--color-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.c-location-map__location-link {
+  display: inline-flex;
+  min-height: 34px;
+  padding: 7px 12px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-lake);
+  border-radius: 4px;
+  color: var(--color-lake);
+  background: var(--color-surface);
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.2;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.c-location-map__location-link:hover {
+  border-color: var(--color-fairway);
+  color: var(--color-surface);
+  background: var(--color-fairway);
+}
+
+.c-location-map__marker {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 2px solid var(--color-surface);
+  border-radius: 50%;
+  background: var(--color-fairway);
+  box-shadow: 0 8px 18px rgba(15, 43, 55, 0.28);
+}
+
+.c-location-map__marker--event {
+  background: var(--color-gold);
+}
+
+.c-location-map__marker span {
+  color: var(--color-surface);
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.leaflet-container {
+  font-family: var(--font-body);
 }
 
 .c-contact__info {
@@ -1246,9 +1400,25 @@ textarea:focus-visible {
   }
 
   .c-event-meta,
+  .c-location-map__header,
   .c-contact-form,
   .c-contact__info {
     padding: 22px 18px;
+  }
+
+  .c-location-map__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .c-location-map__canvas {
+    min-height: 340px;
+  }
+
+  .c-location-map__locations {
+    max-height: none;
+    overflow: visible;
+    border-top: 1px solid var(--color-border);
+    border-left: 0;
   }
 
   .c-contact-actions,
@@ -1372,6 +1542,7 @@ textarea:focus-visible {
   .c-activity__body,
   .c-activity-highlights,
   .c-event-meta,
+  .c-location-map__header,
   .c-contact-form,
   .c-contact__info,
   .c-inline-contact {

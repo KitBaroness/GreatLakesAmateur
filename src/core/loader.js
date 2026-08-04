@@ -4,13 +4,73 @@ import { createRouter, getPathFromHash } from '../utilities/router.js';
 
 const bySelector = (selector) => document.querySelector(selector);
 const storagePrefix = 'flexnet:';
+const defaultLeafletModuleUrl = 'https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.js';
+const defaultLeafletStylesheetUrl = 'https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.css';
 let developerSignatureLogged = false;
+let leafletModulePromise = null;
+let leafletStylesheetPromise = null;
 
 /**
  * @param {Array} items
  * @returns {*}
  */
 const pickRandomItem = (items) => items[Math.floor(Math.random() * items.length)];
+
+/**
+ * @pure
+ * @param {*} value
+ * @returns {String}
+ */
+const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;'
+})[character]);
+
+/**
+ * @effect
+ * @param {String} moduleUrl
+ * @returns {Promise<Object>}
+ */
+const loadLeafletModule = (moduleUrl = defaultLeafletModuleUrl) => {
+  leafletModulePromise ||= import(moduleUrl);
+  return leafletModulePromise;
+};
+
+/**
+ * @effect
+ * @param {String} stylesheetUrl
+ * @returns {Promise<HTMLLinkElement>}
+ */
+const loadStylesheet = (stylesheetUrl) => new Promise((resolve, reject) => {
+  const existingLink = document.querySelector(`link[href="${stylesheetUrl}"]`);
+
+  if (existingLink) {
+    resolve(existingLink);
+    return;
+  }
+
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = stylesheetUrl;
+  link.crossOrigin = '';
+  link.onload = () => resolve(link);
+  link.onerror = () => reject(new Error(`Unable to load stylesheet: ${stylesheetUrl}`));
+
+  document.head.append(link);
+});
+
+/**
+ * @effect
+ * @param {String} stylesheetUrl
+ * @returns {Promise<HTMLLinkElement>}
+ */
+const loadLeafletStylesheet = (stylesheetUrl = defaultLeafletStylesheetUrl) => {
+  leafletStylesheetPromise ||= loadStylesheet(stylesheetUrl);
+  return leafletStylesheetPromise;
+};
 
 /**
  * @effect
@@ -237,6 +297,119 @@ const hydrateContactLinks = (config) => {
 
 /**
  * @pure
+ * @param {Object} location
+ * @returns {String}
+ */
+const createLocationListItemMarkup = (location) => `
+  <article class="c-location-map__location c-location-map__location--${escapeHtml(location.type)}">
+    <p class="c-location-map__location-label">${escapeHtml(location.label)}</p>
+    <h3 class="c-location-map__location-title">${escapeHtml(location.title)}</h3>
+    <p class="c-location-map__location-address">${escapeHtml(location.address)}</p>
+    <p class="c-location-map__location-note">${escapeHtml(location.note)}</p>
+    <a class="c-location-map__location-link" href="${escapeHtml(location.mapUrl)}" target="_blank" rel="noopener noreferrer">Open Map</a>
+  </article>
+`;
+
+/**
+ * @pure
+ * @param {Object} location
+ * @returns {String}
+ */
+const createLocationPopupMarkup = (location) => `
+  <strong>${escapeHtml(location.title)}</strong><br>
+  ${escapeHtml(location.address)}<br>
+  <span>${escapeHtml(location.note)}</span>
+`;
+
+/**
+ * @effect
+ * @param {Object} config
+ * @returns {void}
+ */
+const hydrateLocationList = (config) => {
+  const host = bySelector('[data-map-location-list]');
+  const mapConfig = window.FlexNetSiteConfig?.getLocationMap?.(config);
+
+  if (!host || !mapConfig?.locations?.length) return;
+
+  host.innerHTML = mapConfig.locations.map(createLocationListItemMarkup).join('');
+};
+
+/**
+ * @pure
+ * @param {Object} location
+ * @param {Function} DivIcon
+ * @returns {Object}
+ */
+const createLocationMarkerIcon = (location, DivIcon) => new DivIcon({
+  className: `c-location-map__marker c-location-map__marker--${location.type}`,
+  html: `<span>${location.type === 'event' ? 'E' : 'H'}</span>`,
+  iconSize: [34, 34],
+  iconAnchor: [17, 17],
+  popupAnchor: [0, -17]
+});
+
+/**
+ * @effect
+ * @param {Object} config
+ * @returns {Promise<void>}
+ */
+const hydrateLocationMap = async (config) => {
+  const host = bySelector('[data-contact-map]');
+  const mapConfig = window.FlexNetSiteConfig?.getLocationMap?.(config);
+
+  hydrateLocationList(config);
+
+  if (!host || host.dataset.mapReady === 'true' || !mapConfig?.locations?.length) return;
+
+  host.dataset.mapReady = 'loading';
+
+  try {
+    const [leaflet] = await Promise.all([
+      loadLeafletModule(mapConfig.moduleUrl),
+      loadLeafletStylesheet(mapConfig.stylesheetUrl)
+    ]);
+    const { DivIcon, Map, Marker, Popup, TileLayer } = leaflet;
+
+    if (!host.isConnected) return;
+
+    const map = new Map(host, {
+      scrollWheelZoom: false,
+      zoomControl: true
+    }).setView(mapConfig.center, mapConfig.zoom);
+
+    new TileLayer(mapConfig.tileLayer.url, {
+      maxZoom: 19,
+      attribution: mapConfig.tileLayer.attribution
+    }).addTo(map);
+
+    const locationPoints = mapConfig.locations.map((location) => location.coordinates);
+
+    mapConfig.locations.forEach((location) => {
+      const marker = new Marker(location.coordinates, {
+        icon: createLocationMarkerIcon(location, DivIcon),
+        title: location.title
+      }).addTo(map);
+
+      marker.bindPopup(new Popup().setContent(createLocationPopupMarkup(location)));
+    });
+
+    map.fitBounds(locationPoints, {
+      padding: [34, 34],
+      maxZoom: mapConfig.maxFitZoom
+    });
+
+    requestAnimationFrame(() => map.invalidateSize());
+    host.dataset.mapReady = 'true';
+  } catch (error) {
+    host.dataset.mapReady = 'false';
+    host.innerHTML = '<p class="c-location-map__fallback">Map unavailable. Please use the location list.</p>';
+    console.warn('[FlexNet] Location map could not load.', error);
+  }
+};
+
+/**
+ * @pure
  * @param {Object} config
  * @param {HTMLFormElement} form
  * @returns {String}
@@ -376,6 +549,7 @@ const initializeApp = () => {
     closeMobileNavigation();
     hydratePaymentLinks(config);
     hydrateContactLinks(config);
+    hydrateLocationMap(config);
   });
 
   window.FlexNetApp = createRouter(config, {

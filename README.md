@@ -18,6 +18,7 @@ This project intentionally uses:
 - BEM CSS in `css/styles.css`
 - Browser-native routing with `fetch()`, `DOMParser`, and hash routes
 - Static HTML view fragments in `public/views/`
+- Leaflet `2.0.0-alpha.1` JavaScript and CSS are lazy-loaded from a CDN only for the contact-page event and hotel map
 
 The `example/` folder is reference material for FlexNet JSX architecture only. Do not edit `example/` when changing this site.
 
@@ -45,6 +46,7 @@ Security boundaries still matter:
 - `mailto:`, `sms:`, and `tel:` links open the visitor's local apps; they do not securely submit private data to a server.
 - The contact form currently opens a prefilled email and does not send server-side email by itself.
 - Online checkout is intentionally disabled until the site has a dedicated hosted checkout URL or a secure server-side payment endpoint.
+- The contact map loads Leaflet JavaScript and CSS from `unpkg.com` and map tiles from OpenStreetMap, so visitors' browsers make third-party map requests when the contact route is viewed.
 - Any future automatic email delivery, payment checkout, or sponsor payment flow should use a secure backend endpoint such as a Cloudflare Pages Function with environment variables.
 - Any server-side endpoint should validate inputs, rate limit submissions, avoid exposing secrets, and return only the minimum response data needed by the browser.
 
@@ -72,6 +74,7 @@ Browser-controlled HTTP cache, mail client drafts, SMS drafts, autofill systems,
 - `src/utilities/router.js`: Browser-native hash router and view loader.
 - `public/views/`: Static page fragments loaded by the router.
 - `css/styles.css`: BEM component styling only.
+- `locationMap` in `src/core/site-config.js`: Contact-page event location, nearby hotel markers, OpenStreetMap links, and Leaflet module settings.
 
 ## Design System
 
@@ -89,7 +92,7 @@ The visual theme is tuned for a professional amateur golf event in Great Lakes M
 |------|------|-------------|
 | `#/home` | `public/views/home/index.html` | Home page with tournament hero, dates, and highlighted entry fee |
 | `#/event-details` | `public/views/event-details/index.html` | Tournament details, schedule, prizes, course info, entry fee, and scoring link |
-| `#/contact` | `public/views/contact/index.html` | Contact form plus call, text, and email actions |
+| `#/contact` | `public/views/contact/index.html` | Contact form, call/text/email actions, and Leaflet map for Eagle Crest plus nearby hotels |
 | `#/upcoming-events` | `public/views/upcoming-events/index.html` | Upcoming events listing |
 | `#/sponsorship` | `public/views/sponsorship/index.html` | Sponsorship tiers, benefits, and invoice inquiry actions |
 
@@ -128,6 +131,7 @@ For automatic form email delivery, add a backend endpoint such as a Cloudflare P
 - **Styles**: Edit BEM components in `css/styles.css`.
 - **Payments**: Edit the `payments` object in `src/core/site-config.js`.
 - **Contact actions**: Edit the `contact` object in `src/core/site-config.js`.
+- **Contact map and hotels**: Edit the `locationMap` object in `src/core/site-config.js`.
 - **Console easter egg**: Edit the `developerSignature` object in `src/core/site-config.js`.
 
 ## Source

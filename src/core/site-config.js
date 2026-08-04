@@ -41,6 +41,15 @@
    */
   const buildSmsLink = (body) => `sms:${paymentContact.phoneE164}?body=${encodeURIComponent(body)}`;
 
+  /**
+   * @pure
+   * @param {String} query
+   * @returns {String}
+   */
+  const buildOpenStreetMapSearchLink = (query) => (
+    `https://www.openstreetmap.org/search?query=${encodeURIComponent(query)}`
+  );
+
   const inquiryCopy = {
     general: [
       'Hello Ryan,',
@@ -217,6 +226,70 @@
         }
       }
     },
+    locationMap: {
+      provider: 'Leaflet 2.0.0-alpha.1',
+      moduleUrl: 'https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.js',
+      stylesheetUrl: 'https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.css',
+      center: [42.232, -83.672],
+      zoom: 12,
+      maxFitZoom: 14,
+      tileLayer: {
+        url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      },
+      locations: [
+        {
+          key: 'eagleCrestGolfClub',
+          type: 'event',
+          label: 'Event Location',
+          title: 'Eagle Crest Golf Club',
+          address: '1201 S. Huron Street, Ypsilanti, MI 48197',
+          note: 'Great Lakes Amateur host course',
+          coordinates: [42.225, -83.61056],
+          mapUrl: buildOpenStreetMapSearchLink('Eagle Crest Golf Club, 1201 S. Huron Street, Ypsilanti, MI 48197')
+        },
+        {
+          key: 'marriottEagleCrest',
+          type: 'hotel',
+          label: 'On-Site Hotel',
+          title: 'Ann Arbor Marriott Ypsilanti at Eagle Crest',
+          address: '1275 S. Huron Street, Ypsilanti, MI 48197',
+          note: 'On site at Eagle Crest',
+          coordinates: [42.22626, -83.61756],
+          mapUrl: buildOpenStreetMapSearchLink('Ann Arbor Marriott Ypsilanti at Eagle Crest, 1275 S. Huron Street, Ypsilanti, MI 48197')
+        },
+        {
+          key: 'hamptonYpsilanti',
+          type: 'hotel',
+          label: 'Nearby Hotel',
+          title: 'Hampton Inn & Suites Ypsilanti',
+          address: '515 James L Hart Parkway, Ypsilanti, MI 48197',
+          note: 'Across the street from Eagle Crest',
+          coordinates: [42.224907, -83.620962],
+          mapUrl: buildOpenStreetMapSearchLink('Hampton Inn & Suites Ypsilanti, 515 James L Hart Parkway, Ypsilanti, MI 48197')
+        },
+        {
+          key: 'fairfieldYpsilanti',
+          type: 'hotel',
+          label: 'Nearby Hotel',
+          title: 'Fairfield Inn & Suites Ann Arbor Ypsilanti',
+          address: '326 James L Hart Parkway, Ypsilanti, MI 48197',
+          note: 'Across the street from Eagle Crest',
+          coordinates: [42.2258574, -83.6193269],
+          mapUrl: buildOpenStreetMapSearchLink('Fairfield Inn & Suites Ann Arbor Ypsilanti, 326 James L Hart Parkway, Ypsilanti, MI 48197')
+        },
+        {
+          key: 'sheratonAnnArbor',
+          type: 'hotel',
+          label: 'Nearby Hotel',
+          title: 'Sheraton Ann Arbor Hotel',
+          address: '3200 Boardwalk Street, Ann Arbor, MI 48108',
+          note: 'Less than 10 minutes from Eagle Crest',
+          coordinates: [42.2404, -83.7356],
+          mapUrl: buildOpenStreetMapSearchLink('Sheraton Ann Arbor Hotel, 3200 Boardwalk Street, Ann Arbor, MI 48108')
+        }
+      ]
+    },
     payments: {
       fallbackPhone: paymentContact.phone,
       fallbackEmail: paymentContact.email,
@@ -383,6 +456,13 @@
   /**
    * @pure
    * @param {Object} config
+   * @returns {Object}
+   */
+  const getLocationMap = (config) => config.locationMap;
+
+  /**
+   * @pure
+   * @param {Object} config
    * @param {String} key
    * @returns {Object|null}
    */
@@ -458,6 +538,7 @@
     getDeveloperSignature,
     getPayments,
     getContact,
+    getLocationMap,
     getContactAction,
     getPaymentOption,
     buildRoutes,
