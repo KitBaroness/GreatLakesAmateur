@@ -353,7 +353,7 @@ const renderRegistrationErrors = (root, errors) => {
  * @returns {void}
  */
 const populateRegistrationForm = (form, draft) => {
-  if (!draft?.form) return;
+  if (!form || !draft?.form) return;
 
   Object.entries(draft.form).forEach(([key, value]) => {
     const field = form.elements.namedItem(key);
@@ -502,7 +502,10 @@ const hydrateRegistrationView = (config, root, draft) => {
   }
 
   if (draft) {
-    populateRegistrationForm(form, draft);
+    if (form) {
+      populateRegistrationForm(form, draft);
+    }
+
     renderInvoiceStep(config, root, draft);
     renderSendStep(config, root, draft);
     showRegistrationStep(root, draft.step);
