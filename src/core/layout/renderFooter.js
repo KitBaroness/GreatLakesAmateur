@@ -3,14 +3,15 @@
  */
 
 import { escapeHtml } from '../../utilities/escapeHtml.js';
+import SiteConfig from '../site-config.js';
 
 /**
  * @pure
  * @param {Object} config
  * @returns {String}
  */
-export const createFooterMarkup = (config) => {
-  const footer = window.FlexNetSiteConfig.getFooter(config);
+const createFooterMarkup = (config) => {
+  const footer = SiteConfig.getFooter(config);
 
   return `
     <div class="c-site-footer__inner">

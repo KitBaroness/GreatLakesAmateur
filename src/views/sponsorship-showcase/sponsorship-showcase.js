@@ -4,6 +4,7 @@
  */
 
 import { escapeHtml } from '../../utilities/escapeHtml.js';
+import SiteConfig from '../../core/site-config.js';
 
 const ROOT_SELECTOR = '[data-sponsorship-showcase]';
 const TRACK_SELECTOR = '[data-sponsor-carousel-track]';
@@ -38,7 +39,7 @@ const createMonogram = (name) => {
  * @param {String} routePath
  * @returns {Boolean}
  */
-export const shouldRenderSponsorshipShowcase = (config, routePath) => (
+const shouldRenderSponsorshipShowcase = (config, routePath) => (
   routePath === config.sponsorshipShowcase?.route
 );
 
@@ -47,7 +48,7 @@ export const shouldRenderSponsorshipShowcase = (config, routePath) => (
  * @param {Object} logo
  * @returns {String}
  */
-export const createLogoSlideMarkup = (logo) => {
+const createLogoSlideMarkup = (logo) => {
   const visual = logo.logo
     ? `<img class="c-sponsor-carousel__logo-image" src="${escapeHtml(logo.logo)}" alt="${escapeHtml(logo.name)} logo" loading="lazy">`
     : `<span class="c-sponsor-carousel__monogram" aria-hidden="true">${escapeHtml(createMonogram(logo.name))}</span>`;
@@ -78,7 +79,7 @@ export const createLogoSlideMarkup = (logo) => {
  * @param {Array} logos
  * @returns {String}
  */
-export const createCarouselTrackMarkup = (logos) => (
+const createCarouselTrackMarkup = (logos) => (
   logos.map(createLogoSlideMarkup).join('')
 );
 
@@ -87,7 +88,7 @@ export const createCarouselTrackMarkup = (logos) => (
  * @param {Object} testimonial
  * @returns {String}
  */
-export const createTestimonialMarkup = (testimonial) => `
+const createTestimonialMarkup = (testimonial) => `
   <blockquote class="c-sponsor-testimonials__item">
     <p class="c-sponsor-testimonials__quote">“${escapeHtml(testimonial.quote)}”</p>
     <footer class="c-sponsor-testimonials__footer">
@@ -102,9 +103,28 @@ export const createTestimonialMarkup = (testimonial) => `
  * @param {Array} testimonials
  * @returns {String}
  */
-export const createTestimonialsMarkup = (testimonials) => (
+const createTestimonialsMarkup = (testimonials) => (
   testimonials.map(createTestimonialMarkup).join('')
 );
+
+/**
+ * @effect
+ * @param {HTMLElement} root
+ * @param {Number} index
+ * @returns {void}
+ */
+const updateCarouselStatus = (root) => {
+  const status = root.querySelector('[data-sponsor-carousel-status]');
+  const slides = root.querySelectorAll('.c-sponsor-carousel__slide');
+
+  if (!status || !slides.length) {
+    return;
+  }
+
+  const activeSlide = slides[runtime.activeIndex];
+  const logoName = activeSlide?.querySelector('img')?.alt?.replace(/\s+logo$/i, '') || `Sponsor ${runtime.activeIndex + 1}`;
+  status.textContent = `Showing ${runtime.activeIndex + 1} of ${slides.length}: ${logoName}`;
+};
 
 /**
  * @effect
@@ -123,9 +143,12 @@ const setCarouselIndex = (root, index) => {
   track.style.transform = `translateX(-${runtime.activeIndex * 100}%)`;
 
   dots.forEach((dot, dotIndex) => {
-    dot.classList.toggle('c-sponsor-carousel__dot--active', dotIndex === runtime.activeIndex);
-    dot.setAttribute('aria-selected', String(dotIndex === runtime.activeIndex));
+    const isActive = dotIndex === runtime.activeIndex;
+    dot.classList.toggle('c-sponsor-carousel__dot--active', isActive);
+    dot.setAttribute('aria-current', isActive ? 'true' : 'false');
   });
+
+  updateCarouselStatus(root);
 };
 
 /**
@@ -184,7 +207,7 @@ const renderCarouselDots = (root, showcase) => {
       data-sponsor-carousel-dot
       data-slide-index="${index}"
       aria-label="Show sponsor ${escapeHtml(logo.name)}"
-      aria-selected="${index === 0 ? 'true' : 'false'}"
+      aria-current="${index === 0 ? 'true' : 'false'}"
     ></button>`
   )).join('');
 };
@@ -196,13 +219,22 @@ const renderCarouselDots = (root, showcase) => {
  * @returns {void}
  */
 const hydrateSponsorshipShowcase = (config, root) => {
-  const showcase = window.FlexNetSiteConfig?.getSponsorshipShowcase?.(config);
+  const showcase = SiteConfig.getSponsorshipShowcase(config);
   if (!showcase) return;
 
   const track = root.querySelector(TRACK_SELECTOR);
   const testimonialsHost = document.querySelector(TESTIMONIALS_SELECTOR);
 
   if (track && showcase.logos?.length) {
+    let status = root.querySelector('[data-sponsor-carousel-status]');
+    if (!status) {
+      status = document.createElement('p');
+      status.className = 'u-visually-hidden';
+      status.setAttribute('data-sponsor-carousel-status', '');
+      status.setAttribute('aria-live', 'polite');
+      root.querySelector('.c-sponsor-carousel__frame')?.prepend(status);
+    }
+
     track.innerHTML = createCarouselTrackMarkup(showcase.logos);
     runtime.slideCount = showcase.logos.length;
     renderCarouselDots(root, showcase);
@@ -219,7 +251,7 @@ const hydrateSponsorshipShowcase = (config, root) => {
  * @effect
  * @returns {void}
  */
-export const resetSponsorshipShowcase = () => {
+const resetSponsorshipShowcase = () => {
   stopCarouselAutoplay();
 
   if (runtime.root && runtime.clickHandler) {

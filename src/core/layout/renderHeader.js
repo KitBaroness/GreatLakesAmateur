@@ -4,6 +4,7 @@
  */
 
 import { escapeHtml } from '../../utilities/escapeHtml.js';
+import SiteConfig from '../site-config.js';
 
 const toHash = (route) => `#${route}`;
 
@@ -35,11 +36,11 @@ const ctaClass = (variant) => (
  * @param {String} currentPath
  * @returns {String}
  */
-export const createHeaderMarkup = (config, currentPath) => {
-  const brand = window.FlexNetSiteConfig.getBrand(config);
-  const navItems = window.FlexNetSiteConfig.getNavigation(config)
+const createHeaderMarkup = (config, currentPath) => {
+  const brand = SiteConfig.getBrand(config);
+  const navItems = SiteConfig.getNavigation(config)
     .filter((item) => item.route !== brand.homeRoute);
-  const actions = window.FlexNetSiteConfig.getCallsToAction(config);
+  const actions = SiteConfig.getCallsToAction(config);
 
   const navMarkup = navItems.map((item) => `
         <a class="${navLinkClass(item.route, currentPath)}" href="${toHash(item.route)}"${ariaCurrent(item.route, currentPath)}>${escapeHtml(item.label)}</a>
@@ -52,7 +53,10 @@ export const createHeaderMarkup = (config, currentPath) => {
   return `
     <div class="c-site-header__inner">
       <a class="c-site-header__brand" href="${toHash(brand.homeRoute)}" aria-label="${escapeHtml(brand.name)} home">
-        <img class="c-site-header__logo" src="${escapeHtml(brand.logo)}" alt="${escapeHtml(brand.logoAlt)}">
+        <picture>
+          <source srcset="assets/images/logo-200.webp" type="image/webp">
+          <img class="c-site-header__logo" src="${escapeHtml(brand.logo)}" alt="${escapeHtml(brand.logoAlt)}" width="600" height="473" fetchpriority="high" decoding="async">
+        </picture>
       </a>
 
       <nav class="c-site-header__nav" aria-label="Main navigation">

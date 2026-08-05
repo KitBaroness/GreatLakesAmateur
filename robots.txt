@@ -1,0 +1,15 @@
+# Michigan Players Golf Club - Great Lakes Amateur
+#
+# The site is a client-rendered single page app, so crawlers must be able to
+# fetch /src/, /public/, /css/, and /assets/ to render page content. Nothing
+# is disallowed for that reason.
+#
+# Keep this file even though Cloudflare's managed robots.txt is enabled.
+# Cloudflare prepends its AI-crawler block to an existing robots.txt rather
+# than replacing it, and it never emits a Sitemap directive, so removing this
+# file would lose sitemap discovery.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://www.michiganplayersgolfclub.com/sitemap.xml

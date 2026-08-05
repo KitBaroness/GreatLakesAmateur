@@ -1,9 +1,8 @@
+import SiteConfig from './site-config.js';
 import { renderHeader } from './layout/renderHeader.js';
 import { renderFooter } from './layout/renderFooter.js';
 import { createRouter, getPathFromHash } from '../utilities/router.js';
-import { initLocationMap } from '../views/location-map/location-map.js';
-import { initRegistrationForm } from '../views/registration-invoice/registration-invoice.js';
-import { initSponsorshipShowcase } from '../views/sponsorship-showcase/sponsorship-showcase.js';
+import { hydrateRouteViews } from '../utilities/routeViewModules.js';
 
 const bySelector = (selector) => document.querySelector(selector);
 const storagePrefix = 'flexnet:';
@@ -22,7 +21,7 @@ const pickRandomItem = (items) => items[Math.floor(Math.random() * items.length)
  * @returns {void}
  */
 const logDeveloperSignature = (config) => {
-  const signature = window.FlexNetSiteConfig?.getDeveloperSignature?.(config);
+  const signature = SiteConfig.getDeveloperSignature(config);
 
   if (
     developerSignatureLogged ||
@@ -106,6 +105,7 @@ const closeMobileNavigation = () => {
 
   toggle.classList.remove('c-site-header__toggle--open');
   toggle.setAttribute('aria-expanded', 'false');
+  toggle.setAttribute('aria-label', 'Open menu');
   nav.hidden = true;
 };
 
@@ -122,6 +122,7 @@ const toggleMobileNavigation = () => {
   const isOpen = toggle.getAttribute('aria-expanded') === 'true';
   toggle.classList.toggle('c-site-header__toggle--open', !isOpen);
   toggle.setAttribute('aria-expanded', String(!isOpen));
+  toggle.setAttribute('aria-label', isOpen ? 'Open menu' : 'Close menu');
   nav.hidden = isOpen;
 };
 
@@ -194,7 +195,7 @@ const markPaymentLinkUnconfigured = (link) => {
  * @returns {void}
  */
 const hydratePaymentLinks = (config) => {
-  const getPaymentOption = window.FlexNetSiteConfig?.getPaymentOption;
+  const getPaymentOption = SiteConfig.getPaymentOption;
 
   document.querySelectorAll('[data-payment-key]').forEach((link) => {
     const key = link.getAttribute('data-payment-key');
@@ -237,7 +238,7 @@ const hydrateContactLink = (link, action) => {
  * @returns {void}
  */
 const hydrateContactLinks = (config) => {
-  const getContactAction = window.FlexNetSiteConfig?.getContactAction;
+  const getContactAction = SiteConfig.getContactAction;
 
   document.querySelectorAll('[data-contact-action]').forEach((link) => {
     const key = link.getAttribute('data-contact-action');
@@ -257,7 +258,7 @@ const hydrateContactLinks = (config) => {
  */
 const getPaymentForTrigger = (trigger, config) => {
   const key = trigger.getAttribute('data-payment-key');
-  return key ? window.FlexNetSiteConfig?.getPaymentOption(config, key) : null;
+  return key ? SiteConfig.getPaymentOption(config, key) : null;
 };
 
 /**
@@ -268,7 +269,7 @@ const getPaymentForTrigger = (trigger, config) => {
 const handlePaymentFallback = (trigger, config) => {
   const configuredPayment = getPaymentForTrigger(trigger, config);
   const label = configuredPayment?.label || trigger.getAttribute('data-payment-label') || 'Payment';
-  const payment = window.FlexNetSiteConfig?.getPayments(config);
+  const payment = SiteConfig.getPayments(config);
   const message = payment
     ? `${label} ${payment.fallbackMessage} Please use the Contact page call, text, or email options.`
     : `${label} checkout link is not configured yet.`;
@@ -332,7 +333,7 @@ const bindSessionPrivacyGuards = () => {
  * @returns {void}
  */
 const initializeApp = () => {
-  const config = window.FlexNetSiteConfig?.config;
+  const config = SiteConfig.config;
 
   if (!config) {
     console.error('[FlexNet] Missing site configuration.');
@@ -352,12 +353,10 @@ const initializeApp = () => {
     closeMobileNavigation();
     hydratePaymentLinks(config);
     hydrateContactLinks(config);
-    initLocationMap(config, event.detail.path);
-    initRegistrationForm(config, event.detail.path);
-    initSponsorshipShowcase(config, event.detail.path);
+    hydrateRouteViews(config, event.detail.path);
   });
 
-  window.FlexNetApp = createRouter(config, {
+  createRouter(config, {
     containerId: 'content-placeholder'
   });
 };

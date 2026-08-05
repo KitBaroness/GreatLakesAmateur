@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Routing is hash based (index.html#/route). Search engines drop the fragment,
+  so the application resolves to a single indexable URL. Add further <url>
+  entries here only if the router moves to real paths.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://www.michiganplayersgolfclub.com/</loc>
+    <lastmod>2026-08-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://www.michiganplayersgolfclub.com/assets/images/og-image.jpg</image:loc>
+      <image:title>2nd Annual Great Lakes Amateur</image:title>
+    </image:image>
+  </url>
+</urlset>

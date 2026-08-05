@@ -3,6 +3,8 @@
  * Browser-native only: fetch, DOMParser, CustomEvent, history/hash APIs.
  */
 
+import SiteConfig from '../core/site-config.js';
+
 const createTemplateCache = () => {
   const cache = new Map();
 
@@ -24,7 +26,7 @@ const templateCache = createTemplateCache();
  * @param {String} path
  * @returns {String}
  */
-export const normalizePath = (path) => {
+const normalizePath = (path) => {
   const raw = String(path || '').trim();
   const withoutHash = raw.startsWith('#') ? raw.slice(1) : raw;
   const pathOnly = withoutHash.split('?')[0].split('#')[0];
@@ -33,7 +35,7 @@ export const normalizePath = (path) => {
 };
 
 /**
- * @pure
+ * @effect
  * @returns {String}
  */
 export const getPathFromHash = () => normalizePath(window.location.hash ? window.location.hash.slice(1) : '/');
@@ -43,7 +45,7 @@ export const getPathFromHash = () => normalizePath(window.location.hash ? window
  * @param {String} html
  * @returns {String}
  */
-export const extractPageContent = (html) => {
+const extractPageContent = (html) => {
   const parser = new DOMParser();
   const documentFragment = parser.parseFromString(html, 'text/html');
   const pageContent = documentFragment.getElementById('page-content');
@@ -65,7 +67,7 @@ const loadTemplate = async (view, version) => {
     return cached;
   }
 
-  const response = await fetch(view);
+  const response = await fetch(`${view}?v=${encodeURIComponent(version)}`);
 
   if (!response.ok) {
     throw new Error(`Unable to load view: ${view} (${response.status})`);
@@ -76,16 +78,56 @@ const loadTemplate = async (view, version) => {
 
 /**
  * @effect
- * @param {Object} route
+ * @param {String} selector
+ * @param {String} value
  * @returns {void}
  */
-const applyMetadata = (route) => {
-  document.title = route.title || 'Michigan Players Golf Club';
+const setMetaContent = (selector, value) => {
+  const tag = value ? document.head.querySelector(selector) : null;
 
-  const description = document.querySelector('meta[name="description"]');
-  if (description && route.description) {
-    description.setAttribute('content', route.description);
+  if (tag) {
+    tag.setAttribute('content', value);
   }
+};
+
+/**
+ * Deep link for the current route. The canonical tag stays on the site root
+ * because crawlers discard the fragment, so every route resolves to one URL.
+ *
+ * @pure
+ * @param {String} siteUrl
+ * @param {String} path
+ * @returns {String}
+ */
+const buildShareUrl = (siteUrl, path) => {
+  const base = String(siteUrl || '').replace(/\/+$/, '');
+
+  if (!base) {
+    return '';
+  }
+
+  const isRoot = !path || path === '/' || path === '/home';
+
+  return isRoot ? `${base}/` : `${base}/#${path}`;
+};
+
+/**
+ * @effect
+ * @param {Object} route
+ * @param {Object} seo
+ * @returns {void}
+ */
+const applyMetadata = (route, seo = {}) => {
+  const title = route.title || seo.siteName || 'Michigan Players Golf Club';
+
+  document.title = title;
+
+  setMetaContent('meta[name="description"]', route.description);
+  setMetaContent('meta[property="og:title"]', title);
+  setMetaContent('meta[property="og:description"]', route.description);
+  setMetaContent('meta[property="og:url"]', buildShareUrl(seo.siteUrl, route.path));
+  setMetaContent('meta[name="twitter:title"]', title);
+  setMetaContent('meta[name="twitter:description"]', route.description);
 };
 
 /**
@@ -107,6 +149,78 @@ const emitRouteChange = (detail) => {
  */
 const findRoute = (routes, path) => routes.find((route) => route.path === path) || null;
 
+const HOME_PATHS = Object.freeze(['/', '/home']);
+const PREFETCH_PATHS = Object.freeze(['/event-details', '/register']);
+
+/**
+ * @pure
+ * @param {String} path
+ * @returns {Boolean}
+ */
+const isHomePath = (path) => HOME_PATHS.includes(normalizePath(path));
+
+/**
+ * @effect
+ * @param {String} path
+ * @returns {void}
+ */
+const syncHomeHeroPreload = (path) => {
+  const selector = 'link[data-home-hero-preload]';
+  const existing = document.head.querySelector(selector);
+
+  if (!isHomePath(path)) {
+    existing?.remove();
+    return;
+  }
+
+  if (existing) {
+    return;
+  }
+
+  const link = document.createElement('link');
+  link.rel = 'preload';
+  link.as = 'image';
+  link.href = 'assets/images/hero-430.avif';
+  link.type = 'image/avif';
+  link.setAttribute('imagesrcset', 'assets/images/hero-430.avif 430w, assets/images/hero.avif 860w');
+  link.setAttribute('imagesizes', '(max-width: 768px) 322px, 430px');
+  link.fetchPriority = 'high';
+  link.setAttribute('data-home-hero-preload', '');
+  document.head.appendChild(link);
+};
+
+/**
+ * @effect
+ * @param {Array} routes
+ * @param {String} version
+ * @param {String} currentPath
+ * @returns {void}
+ */
+const prefetchLikelyViews = (routes, version, currentPath) => {
+  if (!isHomePath(currentPath) || typeof window.requestIdleCallback !== 'function') {
+    return;
+  }
+
+  window.requestIdleCallback(() => {
+    PREFETCH_PATHS.forEach((path) => {
+      if (path === normalizePath(currentPath)) {
+        return;
+      }
+
+      const route = findRoute(routes, path);
+      if (!route?.view || document.head.querySelector(`link[data-view-prefetch="${path}"]`)) {
+        return;
+      }
+
+      const link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = `${route.view}?v=${encodeURIComponent(version)}`;
+      link.setAttribute('data-view-prefetch', path);
+      document.head.appendChild(link);
+    });
+  }, { timeout: 2500 });
+};
+
 /**
  * @effect
  * @param {Object} config
@@ -115,8 +229,8 @@ const findRoute = (routes, path) => routes.find((route) => route.path === path) 
  */
 export const createRouter = (config, options = {}) => {
   const containerId = options.containerId || 'content-placeholder';
-  const routes = window.FlexNetSiteConfig.buildRoutes(config);
-  const defaultRoute = window.FlexNetSiteConfig.getDefaultRoute(config);
+  const routes = SiteConfig.buildRoutes(config);
+  const defaultRoute = SiteConfig.getDefaultRoute(config);
 
   const navigate = async (path, shouldUpdateHash = true) => {
     const requestedPath = normalizePath(path);
@@ -135,12 +249,31 @@ export const createRouter = (config, options = {}) => {
     }
 
     try {
+      if (contentHost.dataset.shellRoute === resolvedPath) {
+        delete contentHost.dataset.shellRoute;
+
+        requestAnimationFrame(() => {
+          applyMetadata(resolvedRoute, config.seo);
+          syncHomeHeroPreload(resolvedPath);
+          prefetchLikelyViews(routes, config.version, resolvedPath);
+          document.getElementById('app')?.focus({ preventScroll: true });
+          emitRouteChange({
+            path: resolvedPath,
+            label: resolvedRoute.label,
+            timestamp: Date.now()
+          });
+        });
+        return;
+      }
+
       const rawTemplate = await loadTemplate(resolvedRoute.view, config.version);
       const pageMarkup = extractPageContent(rawTemplate);
 
       requestAnimationFrame(() => {
         contentHost.innerHTML = pageMarkup;
-        applyMetadata(resolvedRoute);
+        applyMetadata(resolvedRoute, config.seo);
+        syncHomeHeroPreload(resolvedPath);
+        prefetchLikelyViews(routes, config.version, resolvedPath);
         document.getElementById('app')?.focus({ preventScroll: true });
         window.scrollTo(0, 0);
         emitRouteChange({

@@ -5,6 +5,7 @@
 
 import { escapeHtml } from '../../utilities/escapeHtml.js';
 import { loadScript, loadStylesheet } from '../../utilities/loadCdnAsset.js';
+import SiteConfig from '../../core/site-config.js';
 
 const DEFAULT_LEAFLET_MODULE = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
 const DEFAULT_LEAFLET_STYLESHEET = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
@@ -28,7 +29,7 @@ const runtime = Object.seal({
  * @param {Object} location
  * @returns {String}
  */
-export const createLocationListItemMarkup = (location) => `
+const createLocationListItemMarkup = (location) => `
   <article class="c-location-map__location c-location-map__location--${escapeHtml(location.type)}">
     <p class="c-location-map__location-label">${escapeHtml(location.label)}</p>
     <h3 class="c-location-map__location-title">${escapeHtml(location.title)}</h3>
@@ -43,7 +44,7 @@ export const createLocationListItemMarkup = (location) => `
  * @param {Object} location
  * @returns {String}
  */
-export const createLocationPopupMarkup = (location) => `
+const createLocationPopupMarkup = (location) => `
   <strong>${escapeHtml(location.title)}</strong><br>
   ${escapeHtml(location.address)}<br>
   <span>${escapeHtml(location.note)}</span>
@@ -54,7 +55,7 @@ export const createLocationPopupMarkup = (location) => `
  * @param {Array} locations
  * @returns {String}
  */
-export const createLocationListMarkup = (locations) => (
+const createLocationListMarkup = (locations) => (
   locations.map(createLocationListItemMarkup).join('')
 );
 
@@ -64,7 +65,7 @@ export const createLocationListMarkup = (locations) => (
  * @param {Function} DivIcon
  * @returns {Object}
  */
-export const createLocationMarkerIcon = (location, DivIcon) => new DivIcon({
+const createLocationMarkerIcon = (location, DivIcon) => new DivIcon({
   className: `c-location-map__marker c-location-map__marker--${location.type}`,
   html: `<span>${location.type === 'event' ? 'E' : 'H'}</span>`,
   iconSize: [34, 34],
@@ -78,7 +79,7 @@ export const createLocationMarkerIcon = (location, DivIcon) => new DivIcon({
  * @param {String} routePath
  * @returns {Boolean}
  */
-export const shouldRenderLocationMap = (mapConfig, routePath) => (
+const shouldRenderLocationMap = (mapConfig, routePath) => (
   Boolean(mapConfig?.locations?.length && routePath === (mapConfig.contactRoute || '/contact'))
 );
 
@@ -117,10 +118,31 @@ const renderMapFallback = (host) => {
 
 /**
  * @effect
+ * @returns {void}
+ */
+const ensureMapResourceHints = () => {
+  if (document.head.querySelector('[data-map-resource-hint]')) {
+    return;
+  }
+
+  ['https://unpkg.com', 'https://cdn.jsdelivr.net', 'https://tile.openstreetmap.org'].forEach((href) => {
+    const link = document.createElement('link');
+    link.rel = 'preconnect';
+    link.href = href;
+    link.crossOrigin = '';
+    link.setAttribute('data-map-resource-hint', '');
+    document.head.appendChild(link);
+  });
+};
+
+/**
+ * @effect
  * @param {Object} mapConfig
  * @returns {Promise<Object>}
  */
 const loadLeafletAssets = async (mapConfig) => {
+  ensureMapResourceHints();
+
   const primaryScript = mapConfig.moduleUrl || DEFAULT_LEAFLET_MODULE;
   const primaryStylesheet = mapConfig.stylesheetUrl || DEFAULT_LEAFLET_STYLESHEET;
   const fallbackScript = mapConfig.fallbackModuleUrl || FALLBACK_LEAFLET_MODULE;
@@ -229,7 +251,7 @@ const mountLeafletMap = (host, mapConfig, L) => {
  * @effect
  * @returns {void}
  */
-export const resetLocationMap = () => {
+const resetLocationMap = () => {
   runtime.loadGeneration += 1;
 
   if (runtime.observer) {
@@ -250,9 +272,9 @@ export const resetLocationMap = () => {
  * @param {Object} config
  * @returns {void}
  */
-export const hydrateLocationList = (config) => {
+const hydrateLocationList = (config) => {
   const host = document.querySelector(LIST_HOST_SELECTOR);
-  const mapConfig = window.FlexNetSiteConfig?.getLocationMap?.(config);
+  const mapConfig = SiteConfig.getLocationMap(config);
 
   if (!host || !mapConfig?.locations?.length) return;
 
@@ -266,7 +288,7 @@ export const hydrateLocationList = (config) => {
  * @returns {Promise<void>}
  */
 const activateLocationMap = async (config, host) => {
-  const mapConfig = window.FlexNetSiteConfig?.getLocationMap?.(config);
+  const mapConfig = SiteConfig.getLocationMap(config);
   const generation = runtime.loadGeneration;
 
   if (!mapConfig?.locations?.length || !host.isConnected) return;
@@ -330,7 +352,7 @@ const observeLocationMapHost = (config, host) => {
  * @returns {void}
  */
 export const initLocationMap = (config, routePath) => {
-  const mapConfig = window.FlexNetSiteConfig?.getLocationMap?.(config);
+  const mapConfig = SiteConfig.getLocationMap(config);
 
   hydrateLocationList(config);
 

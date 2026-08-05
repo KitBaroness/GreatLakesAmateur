@@ -2,17 +2,49 @@
   <section class="c-home-hero">
     <div class="c-home-hero__grid">
       <div class="c-home-hero__sidebar">
-        <img class="c-home-hero__sidebar-image" src="assets/images/sidebar.jpg" alt="Golf course scenery">
+        <picture>
+          <source srcset="assets/images/sidebar.webp" type="image/webp">
+          <img
+            class="c-home-hero__sidebar-image"
+            src="assets/images/sidebar.jpg"
+            alt="Fairway and treeline at Eagle Crest Golf Club in Ypsilanti, Michigan"
+            width="563"
+            height="1000"
+            loading="lazy"
+            fetchpriority="low"
+            decoding="async"
+          >
+        </picture>
       </div>
 
       <div class="c-home-hero__content">
         <div class="c-home-hero__media">
           <span class="c-home-hero__badge">Great Lakes Amateur</span>
-          <img class="c-home-hero__image" src="assets/images/hero.jpeg" alt="Golf tournament">
+          <picture>
+            <source
+              srcset="assets/images/hero-430.avif 430w, assets/images/hero.avif 860w"
+              type="image/avif"
+              sizes="(max-width: 768px) 322px, 430px"
+            >
+            <source
+              srcset="assets/images/hero-430.webp 430w, assets/images/hero.webp 860w"
+              type="image/webp"
+              sizes="(max-width: 768px) 322px, 430px"
+            >
+            <img
+              class="c-home-hero__image"
+              src="assets/images/hero.jpeg"
+              alt="Golfer hitting an approach shot during the Great Lakes Amateur at Eagle Crest Golf Club"
+              width="1440"
+              height="1920"
+              fetchpriority="high"
+              decoding="async"
+            >
+          </picture>
         </div>
 
-        <h1 class="c-home-hero__title">Michigan Players Golf Club<br>Presents</h1>
-        <h2 class="c-home-hero__subtitle">2nd Annual Great Lakes Amateur</h2>
+        <p class="c-home-hero__title">Michigan Players Golf Club<br>Presents</p>
+        <h1 class="c-home-hero__subtitle">2nd Annual Great Lakes Amateur</h1>
         <p class="c-home-hero__date">August 17-19, 2026</p>
         <p class="c-home-hero__fee">
           <a class="c-home-hero__pay-link" href="#/register?fee=entryFee">

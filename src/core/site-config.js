@@ -1,16 +1,13 @@
 // FlexNet-style site configuration for Michigan Players Golf Club.
 // Pure data and pure query helpers. Runtime side effects live in loader/router modules.
 
-(function () {
-  'use strict';
-
-  /**
-   * Deep-freeze a value so application data remains immutable after boot.
-   * @pure
-   * @param {*} value
-   * @returns {*}
-   */
-  const deepFreeze = (value) => {
+/**
+ * Deep-freeze a value so application data remains immutable after boot.
+ * @pure
+ * @param {*} value
+ * @returns {*}
+ */
+const deepFreeze = (value) => {
     if (!value || typeof value !== 'object' || Object.isFrozen(value)) {
       return value;
     }
@@ -103,13 +100,26 @@
   };
 
   const siteConfig = deepFreeze({
-    version: '2.0.0',
+    version: '2.0.2',
     brand: {
       name: 'Michigan Players Golf Club',
       shortName: 'Michigan Players',
       logo: 'assets/images/logo.jpg',
       logoAlt: 'Michigan Players Amateur',
       homeRoute: '/home'
+    },
+    seo: {
+      // Update siteUrl to the deployed domain before launch. Canonical and
+      // Open Graph URLs are built from it.
+      siteUrl: 'https://www.michiganplayersgolfclub.com',
+      siteName: 'Michigan Players Golf Club',
+      locale: 'en_US',
+      themeColor: '#173a4a',
+      twitterSite: '@ryanyipgolf',
+      ogImage: 'assets/images/og-image.jpg',
+      ogImageWidth: 1200,
+      ogImageHeight: 630,
+      ogImageAlt: 'Great Lakes Amateur, August 17-19, 2026, Eagle Crest Golf Club, Ypsilanti, Michigan'
     },
     callsToAction: [
       {
@@ -128,43 +138,43 @@
         label: 'Home',
         route: '/home',
         view: 'public/views/home/index.html',
-        title: 'Michigan Players Golf Club | Great Lakes Amateur',
-        description: 'Michigan Players Golf Club presents the 2nd Annual Great Lakes Amateur golf tournament, August 17-19, 2026.'
+        title: 'Great Lakes Amateur 2026 | Michigan Players Golf Club',
+        description: 'The 2nd Annual Great Lakes Amateur, a 54-hole stroke play championship at Eagle Crest Golf Club in Ypsilanti, Michigan, August 17-19, 2026. $299 entry, 90-player field.'
       },
       {
         label: 'Upcoming Events',
         route: '/upcoming-events',
         view: 'public/views/upcoming-events/index.html',
-        title: 'Upcoming Events | Great Lakes Amateur',
-        description: 'Upcoming events from Michigan Players Golf Club.'
+        title: 'Upcoming Golf Events at Eagle Crest | Michigan Players Golf Club',
+        description: 'Tournament play, junior and family summer golf camps, and one-on-one playing lessons at Eagle Crest Golf Club in Ypsilanti, Michigan.'
       },
       {
         label: 'Register',
         route: '/register',
         view: 'public/views/register/index.html',
-        title: 'Register | Great Lakes Amateur',
-        description: 'Register for the Great Lakes Amateur, pay through Venmo, and send your invoice to the tournament committee.'
+        title: 'Register for the Great Lakes Amateur 2026 | Entry $299',
+        description: 'Register for the 2026 Great Lakes Amateur at Eagle Crest Golf Club. Complete your entry, receive an invoice number, and pay the $299 entry fee through Venmo.'
       },
       {
         label: 'Contact',
         route: '/contact',
         view: 'public/views/contact/index.html',
-        title: 'Contact | Great Lakes Amateur',
-        description: 'Contact Michigan Players Golf Club for tournament inquiries and information.'
+        title: 'Contact and Directions | Great Lakes Amateur',
+        description: 'Contact tournament director Ryan Yip about the Great Lakes Amateur, and find directions to Eagle Crest Golf Club plus nearby Ypsilanti hotels.'
       },
       {
         label: 'Event Details',
         route: '/event-details',
         view: 'public/views/event-details/index.html',
-        title: 'Event Details | Great Lakes Amateur',
-        description: 'Great Lakes Amateur tournament information - dates, format, entry requirements, and prizes.'
+        title: 'Tournament Information, Schedule and Prizes | Great Lakes Amateur 2026',
+        description: 'Great Lakes Amateur tournament details: 54-hole stroke play format, round times, USGA handicap entry requirements, $1,800 in cash prizes, course details, and nearby hotels.'
       },
       {
         label: 'Sponsorship',
         route: '/sponsorship',
         view: 'public/views/sponsorship/index.html',
-        title: 'Sponsorship | Great Lakes Amateur',
-        description: 'Sponsorship opportunities for the Great Lakes Amateur golf tournament.'
+        title: 'Sponsorship Opportunities | Great Lakes Amateur 2026',
+        description: 'Title, lunch, putting green, and driving range sponsorships for the Great Lakes Amateur golf tournament at Eagle Crest Golf Club in Ypsilanti, Michigan.'
       }
     ],
     contact: {
@@ -461,8 +471,6 @@
     registration: {
       route: '/register',
       storageKey: 'flexnet:registration:draft',
-      steps: Object.freeze(['details', 'invoice', 'venmo', 'send']),
-      venmoRecipient: 'ryanyipgolf',
       invoicePrefix: 'GLA',
       organization: 'Michigan Players Golf Club',
       eventName: '2nd Annual Great Lakes Amateur',
@@ -585,13 +593,6 @@
   /**
    * @pure
    * @param {Object} config
-   * @returns {Object}
-   */
-  const getRegistration = (config) => config.registration;
-
-  /**
-   * @pure
-   * @param {Object} config
    * @returns {Array}
    */
   const getRegistrationFeeOptions = (config) => {
@@ -621,6 +622,12 @@
    */
   const getSponsorshipShowcase = (config) => config.sponsorshipShowcase;
 
+  /**
+   * @pure
+   * @param {Object} config
+   * @param {String} key
+   * @returns {Object|null}
+   */
   const getPaymentOption = (config, key) => getRegistrationFeeOption(config, key);
 
   /**
@@ -650,30 +657,27 @@
     ]);
   };
 
-  const SiteConfig = deepFreeze({
-    config: siteConfig,
-    deepFreeze,
-    getNavigation,
-    getDefaultRoute,
-    getBrand,
-    getCallsToAction,
-    getFooter,
+const SiteConfig = deepFreeze({
+  config: siteConfig,
+  deepFreeze,
+  getNavigation,
+  getDefaultRoute,
+  getBrand,
+  getCallsToAction,
+  getFooter,
     getDeveloperSignature,
     getPayments,
-    getContact,
     getLocationMap,
-    getRegistration,
     getRegistrationFeeOptions,
-    getRegistrationFeeOption,
-    getSponsorshipShowcase,
-    buildGoogleMapsSearchLink,
-    buildVenmoPaymentUrl,
-    buildMailtoLink,
-    buildSmsLink,
-    getContactAction,
-    getPaymentOption,
-    buildRoutes
-  });
+  getRegistrationFeeOption,
+  getSponsorshipShowcase,
+  buildGoogleMapsSearchLink,
+  buildVenmoPaymentUrl,
+  buildMailtoLink,
+  buildSmsLink,
+  getContactAction,
+  getPaymentOption,
+  buildRoutes
+});
 
-  window.FlexNetSiteConfig = SiteConfig;
-})();
+export default SiteConfig;

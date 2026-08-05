@@ -5,6 +5,7 @@
 
 import { escapeHtml } from '../../utilities/escapeHtml.js';
 import { loadScript } from '../../utilities/loadCdnAsset.js';
+import SiteConfig from '../../core/site-config.js';
 
 const REGISTRATION_FORM_SELECTOR = '[data-registration-form]';
 const REGISTRATION_ROOT_SELECTOR = '[data-registration-root]';
@@ -20,7 +21,7 @@ const runtime = Object.seal({
  * @param {Date} date
  * @returns {String}
  */
-export const formatInvoiceDate = (date = new Date()) => date.toLocaleDateString('en-US', {
+const formatInvoiceDate = (date = new Date()) => date.toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',
   day: 'numeric'
@@ -31,7 +32,7 @@ export const formatInvoiceDate = (date = new Date()) => date.toLocaleDateString(
  * @param {Date} date
  * @returns {String}
  */
-export const formatInvoiceDateStamp = (date = new Date()) => {
+const formatInvoiceDateStamp = (date = new Date()) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
@@ -42,7 +43,7 @@ export const formatInvoiceDateStamp = (date = new Date()) => {
  * @pure
  * @returns {String}
  */
-export const generateInvoiceSuffix = () => Math.random().toString(36).slice(2, 6).toUpperCase();
+const generateInvoiceSuffix = () => Math.random().toString(36).slice(2, 6).toUpperCase();
 
 /**
  * @pure
@@ -50,7 +51,7 @@ export const generateInvoiceSuffix = () => Math.random().toString(36).slice(2, 6
  * @param {Date} date
  * @returns {String}
  */
-export const generateInvoiceNumber = (registrationConfig, date = new Date()) => (
+const generateInvoiceNumber = (registrationConfig, date = new Date()) => (
   `${registrationConfig.invoicePrefix}-${formatInvoiceDateStamp(date)}-${generateInvoiceSuffix()}`
 );
 
@@ -60,7 +61,7 @@ export const generateInvoiceNumber = (registrationConfig, date = new Date()) => 
  * @param {String} routePath
  * @returns {Boolean}
  */
-export const shouldRenderRegistrationForm = (config, routePath) => (
+const shouldRenderRegistrationForm = (config, routePath) => (
   routePath === config.registration?.route
 );
 
@@ -68,7 +69,7 @@ export const shouldRenderRegistrationForm = (config, routePath) => (
  * @pure
  * @returns {Object}
  */
-export const getHashQueryParams = () => {
+const getHashQueryParams = () => {
   const hash = window.location.hash.replace(/^#/, '');
   const queryIndex = hash.indexOf('?');
   const query = queryIndex >= 0 ? hash.slice(queryIndex + 1) : '';
@@ -80,7 +81,7 @@ export const getHashQueryParams = () => {
  * @param {FormData|Object} source
  * @returns {Object}
  */
-export const parseRegistrationForm = (source) => {
+const parseRegistrationForm = (source) => {
   const read = (key) => String(source.get ? source.get(key) : source[key] || '').trim();
 
   return {
@@ -103,7 +104,7 @@ export const parseRegistrationForm = (source) => {
  * @param {Object} form
  * @returns {Array}
  */
-export const validateRegistrationForm = (form) => {
+const validateRegistrationForm = (form) => {
   const errors = [];
 
   if (!form.name) errors.push('Name is required.');
@@ -123,7 +124,7 @@ export const validateRegistrationForm = (form) => {
  * @param {Object} draft
  * @returns {String}
  */
-export const buildVenmoNote = (config, draft) => {
+const buildVenmoNote = (config, draft) => {
   const registration = config.registration;
   return `${registration.invoicePrefix} ${draft.invoiceNumber} ${draft.feeLabel}`;
 };
@@ -134,8 +135,8 @@ export const buildVenmoNote = (config, draft) => {
  * @param {Object} draft
  * @returns {String}
  */
-export const buildVenmoPaymentUrl = (config, draft) => (
-  window.FlexNetSiteConfig.buildVenmoPaymentUrl({
+const buildVenmoPaymentUrl = (config, draft) => (
+  SiteConfig.buildVenmoPaymentUrl({
     recipient: config.payments.venmoRecipient,
     amountNumeric: draft.feeAmountNumeric,
     note: buildVenmoNote(config, draft)
@@ -148,7 +149,7 @@ export const buildVenmoPaymentUrl = (config, draft) => (
  * @param {Object} draft
  * @returns {String}
  */
-export const buildRegistrationInvoiceText = (config, draft) => {
+const buildRegistrationInvoiceText = (config, draft) => {
   const registration = config.registration;
   const lines = [
     `${registration.organization}`,
@@ -193,8 +194,8 @@ export const buildRegistrationInvoiceText = (config, draft) => {
  * @param {Object} draft
  * @returns {String}
  */
-export const buildRegistrationEmailLink = (config, draft) => (
-  window.FlexNetSiteConfig.buildMailtoLink({
+const buildRegistrationEmailLink = (config, draft) => (
+  SiteConfig.buildMailtoLink({
     subject: `${draft.invoiceNumber} ${draft.feeLabel} - ${draft.form.name}`,
     body: [
       'Hello Ryan,',
@@ -215,8 +216,8 @@ export const buildRegistrationEmailLink = (config, draft) => (
  * @param {Object} draft
  * @returns {String}
  */
-export const buildRegistrationSmsLink = (config, draft) => (
-  window.FlexNetSiteConfig.buildSmsLink([
+const buildRegistrationSmsLink = (config, draft) => (
+  SiteConfig.buildSmsLink([
     `GLA Invoice ${draft.invoiceNumber}`,
     `${draft.form.name} paid ${draft.feeAmount} for ${draft.feeLabel}.`,
     `Venmo: @${draft.form.venmoHandle}`,
@@ -232,7 +233,7 @@ export const buildRegistrationSmsLink = (config, draft) => (
  * @param {Object} draft
  * @returns {String}
  */
-export const createInvoicePreviewMarkup = (config, draft) => `
+const createInvoicePreviewMarkup = (config, draft) => `
   <article class="c-registration-invoice">
     <header class="c-registration-invoice__header">
       <p class="c-registration-invoice__eyebrow">${escapeHtml(config.registration.organization)}</p>
@@ -274,7 +275,7 @@ export const createInvoicePreviewMarkup = (config, draft) => `
  * @param {String} selectedKey
  * @returns {String}
  */
-export const createFeeOptionsMarkup = (feeOptions, selectedKey = '') => (
+const createFeeOptionsMarkup = (feeOptions, selectedKey = '') => (
   feeOptions.map((option) => (
     `<option value="${escapeHtml(option.key)}"${option.key === selectedKey ? ' selected' : ''}>${escapeHtml(option.label)} (${escapeHtml(option.amount)})</option>`
   )).join('')
@@ -285,7 +286,7 @@ export const createFeeOptionsMarkup = (feeOptions, selectedKey = '') => (
  * @param {Object} config
  * @returns {Object|null}
  */
-export const loadRegistrationDraft = (config) => {
+const loadRegistrationDraft = (config) => {
   try {
     const raw = sessionStorage.getItem(config.registration.storageKey);
     return raw ? JSON.parse(raw) : null;
@@ -300,7 +301,7 @@ export const loadRegistrationDraft = (config) => {
  * @param {Object} draft
  * @returns {void}
  */
-export const saveRegistrationDraft = (config, draft) => {
+const saveRegistrationDraft = (config, draft) => {
   sessionStorage.setItem(config.registration.storageKey, JSON.stringify(draft));
 };
 
@@ -309,7 +310,7 @@ export const saveRegistrationDraft = (config, draft) => {
  * @param {Object} config
  * @returns {void}
  */
-export const clearRegistrationDraft = (config) => {
+const clearRegistrationDraft = (config) => {
   sessionStorage.removeItem(config.registration.storageKey);
 };
 
@@ -323,6 +324,21 @@ const showRegistrationStep = (root, step) => {
   root.dataset.registrationStep = step;
   root.querySelectorAll('[data-registration-step-panel]').forEach((panel) => {
     panel.hidden = panel.dataset.registrationStepPanel !== step;
+  });
+
+  root.querySelectorAll('[data-registration-step-label]').forEach((item) => {
+    const label = item.dataset.registrationStepLabel;
+
+    if (step === 'complete') {
+      item.removeAttribute('aria-current');
+      return;
+    }
+
+    if (label === step) {
+      item.setAttribute('aria-current', 'step');
+    } else {
+      item.removeAttribute('aria-current');
+    }
   });
 };
 
@@ -338,11 +354,13 @@ const renderRegistrationErrors = (root, errors) => {
 
   if (!errors.length) {
     host.hidden = true;
+    host.removeAttribute('role');
     host.innerHTML = '';
     return;
   }
 
   host.hidden = false;
+  host.setAttribute('role', 'alert');
   host.innerHTML = `<ul class="c-registration__errors">${errors.map((error) => `<li>${escapeHtml(error)}</li>`).join('')}</ul>`;
 };
 
@@ -376,7 +394,7 @@ const populateRegistrationForm = (form, draft) => {
  */
 const createDraftFromForm = (config, form) => {
   const formValues = parseRegistrationForm(new FormData(form));
-  const feeOption = window.FlexNetSiteConfig.getRegistrationFeeOption(config, formValues.feeKey);
+  const feeOption = SiteConfig.getRegistrationFeeOption(config, formValues.feeKey);
 
   if (!feeOption) {
     throw new Error('Select a valid payment type.');
@@ -470,7 +488,7 @@ const loadJsPdf = (config) => {
  * @param {Object} draft
  * @returns {Promise<void>}
  */
-export const downloadRegistrationInvoicePdf = async (config, draft) => {
+const downloadRegistrationInvoicePdf = async (config, draft) => {
   const jsPDF = await loadJsPdf(config);
   const doc = new jsPDF();
   const text = buildRegistrationInvoiceText(config, draft);
@@ -492,7 +510,7 @@ const hydrateRegistrationView = (config, root, draft) => {
   const form = root.querySelector(REGISTRATION_FORM_SELECTOR);
   const feeSelect = form?.elements.namedItem('feeKey');
   const queryFee = getHashQueryParams().fee;
-  const requestedFee = queryFee && window.FlexNetSiteConfig.getRegistrationFeeOption(config, queryFee)
+  const requestedFee = queryFee && SiteConfig.getRegistrationFeeOption(config, queryFee)
     ? queryFee
     : '';
   // A fee chosen from a tier link outranks the stored draft so sponsorship
@@ -502,7 +520,7 @@ const hydrateRegistrationView = (config, root, draft) => {
   if (feeSelect instanceof HTMLSelectElement) {
     const selectedKey = requestedFee || draft?.feeKey || feeSelect.value;
     feeSelect.innerHTML = `<option value="">Select payment type</option>${createFeeOptionsMarkup(
-      window.FlexNetSiteConfig.getRegistrationFeeOptions(config),
+      SiteConfig.getRegistrationFeeOptions(config),
       selectedKey
     )}`;
   }
@@ -618,7 +636,7 @@ const bindRegistrationInteractions = (config, root) => {
  * @effect
  * @returns {void}
  */
-export const unbindRegistrationInteractions = () => {
+const unbindRegistrationInteractions = () => {
   if (!runtime.boundRoot) return;
 
   runtime.boundRoot.removeEventListener('click', runtime.clickHandler);

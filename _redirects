@@ -1,0 +1,18 @@
+# Legacy flat pages predate hash routing. A real 301 keeps link equity and
+# stops thin redirect shells from being indexed as duplicates.
+#
+# Cloudflare Pages applies these rules regardless of whether a file exists at
+# the source path, so they win over the shells still on disk. Pages also
+# rewrites /page.html to its extension-less form, so both variants are listed.
+# The meta refresh inside each shell stays as the fallback for hosts that
+# ignore _redirects.
+
+/contact.html          /#/contact          301
+/event-details.html    /#/event-details    301
+/sponsorship.html      /#/sponsorship      301
+/upcoming-events.html  /#/upcoming-events  301
+
+/contact               /#/contact          301
+/event-details         /#/event-details    301
+/sponsorship           /#/sponsorship      301
+/upcoming-events       /#/upcoming-events  301
