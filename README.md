@@ -238,12 +238,13 @@ flowchart TD
     K[Visitor clicks Finish Registration] --> L[Browser sessionStorage cleared<br/>No server notification]
 ```
 
-Traceability depends on three shared fields:
+Traceability depends on shared registration details in the Venmo note and invoice:
 
 | Field | Where it appears |
 |-------|------------------|
 | Invoice number | Venmo payment note, invoice preview/PDF, email subject, SMS body |
-| Payer Venmo handle | Registration form (required), invoice text, SMS summary |
+| Registrant details | Venmo payment note (name, email, phone, location, course, handicap, optional profile) |
+| Payer Venmo handle | Registration form (required), Venmo note, invoice text, SMS summary |
 | Fee amount and type | Venmo amount prefill, invoice line items |
 
 ### What this flow does not do

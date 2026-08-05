@@ -2440,6 +2440,10 @@ textarea:focus-visible {
   color: var(--color-fairway);
 }
 
+.c-registration-invoice__venmo-note strong {
+  word-break: break-word;
+}
+
 .c-registration-invoice__list {
   display: grid;
   gap: 10px;

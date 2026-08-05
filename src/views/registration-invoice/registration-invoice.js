@@ -9,6 +9,7 @@ import SiteConfig from '../../core/site-config.js';
 
 const REGISTRATION_FORM_SELECTOR = '[data-registration-form]';
 const REGISTRATION_ROOT_SELECTOR = '[data-registration-root]';
+const VENMO_NOTE_MAX_LENGTH = 500;
 
 const runtime = Object.seal({
   boundRoot: null,
@@ -120,14 +121,86 @@ const validateRegistrationForm = (form) => {
 
 /**
  * @pure
+ * @param {String} value
+ * @returns {String}
+ */
+const sanitizeVenmoNotePart = (value) => (
+  String(value ?? '')
+    .replace(/[\r\n\t|]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+);
+
+/**
+ * @pure
+ * @param {Object} config
+ * @param {Object} draft
+ * @returns {Array}
+ */
+const buildVenmoNoteParts = (config, draft) => {
+  const form = draft.form;
+
+  return [
+    `${config.registration.invoicePrefix} ${draft.invoiceNumber} ${draft.feeLabel}`,
+    `Name: ${sanitizeVenmoNotePart(form.name)}`,
+    `Email: ${sanitizeVenmoNotePart(form.email)}`,
+    form.phone ? `Phone: ${sanitizeVenmoNotePart(form.phone)}` : '',
+    `Venmo: @${sanitizeVenmoNotePart(form.venmoHandle)}`,
+    `Location: ${sanitizeVenmoNotePart(form.location)}`,
+    `Course: ${sanitizeVenmoNotePart(form.homeCourse)}`,
+    `HCP: ${sanitizeVenmoNotePart(form.usgaHandicap)}`,
+    form.socialHandles ? `Social: ${sanitizeVenmoNotePart(form.socialHandles)}` : '',
+    form.scoreStatsLinks ? `Stats: ${sanitizeVenmoNotePart(form.scoreStatsLinks)}` : ''
+  ].filter(Boolean);
+};
+
+/**
+ * @pure
+ * @param {Array} parts
+ * @returns {String}
+ */
+const joinVenmoNoteParts = (parts) => parts.join(' | ');
+
+/**
+ * Venmo caps payment notes at 500 characters. Drop optional tail fields first,
+ * then truncate while preserving the invoice reference at the start.
+ * @pure
+ * @param {Array} parts
+ * @returns {String}
+ */
+const fitVenmoNoteLength = (parts) => {
+  const workingParts = [...parts];
+  let note = joinVenmoNoteParts(workingParts);
+
+  while (note.length > VENMO_NOTE_MAX_LENGTH && workingParts.length > 1) {
+    workingParts.pop();
+    note = joinVenmoNoteParts(workingParts);
+  }
+
+  if (note.length <= VENMO_NOTE_MAX_LENGTH) {
+    return note;
+  }
+
+  const invoiceLine = workingParts[0];
+  const remaining = VENMO_NOTE_MAX_LENGTH - invoiceLine.length - 5;
+
+  if (remaining <= 0) {
+    return invoiceLine.slice(0, VENMO_NOTE_MAX_LENGTH);
+  }
+
+  const tail = joinVenmoNoteParts(workingParts.slice(1));
+  return `${invoiceLine} | ${tail.slice(0, remaining)}…`;
+};
+
+/**
+ * @pure
  * @param {Object} config
  * @param {Object} draft
  * @returns {String}
  */
-const buildVenmoNote = (config, draft) => {
-  const registration = config.registration;
-  return `${registration.invoicePrefix} ${draft.invoiceNumber} ${draft.feeLabel}`;
-};
+const buildVenmoNote = (config, draft) => (
+  fitVenmoNoteLength(buildVenmoNoteParts(config, draft))
+);
 
 /**
  * @pure
@@ -200,7 +273,7 @@ const buildRegistrationEmailLink = (config, draft) => (
     body: [
       'Hello Ryan,',
       '',
-      'Please find my Great Lakes Amateur registration invoice below. I completed Venmo payment using the invoice number in the transaction note.',
+      'Please find my Great Lakes Amateur registration invoice below. I completed Venmo payment using my registration details in the transaction note.',
       '',
       buildRegistrationInvoiceText(config, draft),
       '',
@@ -248,7 +321,7 @@ const createInvoicePreviewMarkup = (config, draft) => `
         <p><strong>${escapeHtml(draft.feeLabel)}</strong></p>
         <p class="c-registration-invoice__amount">${escapeHtml(draft.feeAmount)}</p>
         <p>Venmo payee: <strong>@${escapeHtml(config.payments.venmoRecipient)}</strong></p>
-        <p>Venmo note to include: <strong>${escapeHtml(buildVenmoNote(config, draft))}</strong></p>
+        <p class="c-registration-invoice__venmo-note">Venmo note to include: <strong>${escapeHtml(buildVenmoNote(config, draft))}</strong></p>
       </section>
 
       <section class="c-registration-invoice__section">
@@ -449,7 +522,7 @@ const renderSendStep = (config, root, draft) => {
   const invoiceText = buildRegistrationInvoiceText(config, draft);
 
   if (summary) {
-    summary.textContent = `Invoice ${draft.invoiceNumber} for ${draft.feeAmount} (${draft.feeLabel}). Include this invoice number in your Venmo payment note and send the invoice by email or text.`;
+    summary.textContent = `Invoice ${draft.invoiceNumber} for ${draft.feeAmount} (${draft.feeLabel}). Your Venmo payment note includes your registration details. Send the invoice by email or text when payment is complete.`;
   }
 
   if (emailLink) {
