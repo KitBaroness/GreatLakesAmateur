@@ -3,6 +3,8 @@
  * Pure HTML generation is separate from the DOM write performed by renderHeader.
  */
 
+import { escapeHtml } from '../../utilities/escapeHtml.js';
+
 const toHash = (route) => `#${route}`;
 
 const navLinkClass = (route, currentPath) => (
@@ -35,21 +37,22 @@ const ctaClass = (variant) => (
  */
 export const createHeaderMarkup = (config, currentPath) => {
   const brand = window.FlexNetSiteConfig.getBrand(config);
-  const navItems = window.FlexNetSiteConfig.getNavigation(config);
+  const navItems = window.FlexNetSiteConfig.getNavigation(config)
+    .filter((item) => item.route !== brand.homeRoute);
   const actions = window.FlexNetSiteConfig.getCallsToAction(config);
 
   const navMarkup = navItems.map((item) => `
-        <a class="${navLinkClass(item.route, currentPath)}" href="${toHash(item.route)}"${ariaCurrent(item.route, currentPath)}>${item.label}</a>
+        <a class="${navLinkClass(item.route, currentPath)}" href="${toHash(item.route)}"${ariaCurrent(item.route, currentPath)}>${escapeHtml(item.label)}</a>
       `.trim()).join('');
 
   const actionMarkup = actions.map((action) => `
-        <a class="${ctaClass(action.variant)}" href="${toHash(action.route)}">${action.label}</a>
+        <a class="${ctaClass(action.variant)}" href="${toHash(action.route)}">${escapeHtml(action.label)}</a>
       `.trim()).join('');
 
   return `
     <div class="c-site-header__inner">
-      <a class="c-site-header__brand" href="${toHash(brand.homeRoute)}" aria-label="${brand.name} home">
-        <img class="c-site-header__logo" src="${brand.logo}" alt="${brand.logoAlt}">
+      <a class="c-site-header__brand" href="${toHash(brand.homeRoute)}" aria-label="${escapeHtml(brand.name)} home">
+        <img class="c-site-header__logo" src="${escapeHtml(brand.logo)}" alt="${escapeHtml(brand.logoAlt)}">
       </a>
 
       <nav class="c-site-header__nav" aria-label="Main navigation">
@@ -68,7 +71,7 @@ export const createHeaderMarkup = (config, currentPath) => {
     </div>
 
     <nav class="c-mobile-nav" aria-label="Mobile navigation" data-mobile-nav hidden>
-      ${navItems.map((item) => `<a class="${mobileNavLinkClass(item.route, currentPath)}" href="${toHash(item.route)}"${ariaCurrent(item.route, currentPath)}>${item.label}</a>`).join('')}
+      ${navItems.map((item) => `<a class="${mobileNavLinkClass(item.route, currentPath)}" href="${toHash(item.route)}"${ariaCurrent(item.route, currentPath)}>${escapeHtml(item.label)}</a>`).join('')}
     </nav>
   `.trim();
 };

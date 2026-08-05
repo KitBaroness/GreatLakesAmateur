@@ -1,0 +1,128 @@
+<div id="page-content">
+  <section class="c-page-header">
+    <h1 class="c-page-header__title">Register</h1>
+    <p class="c-page-header__subtitle">Complete registration, pay through Venmo, then send your invoice by email or text</p>
+  </section>
+
+  <section class="c-registration" data-registration-root data-registration-step="details">
+    <ol class="c-registration__steps" aria-label="Registration progress">
+      <li class="c-registration__step" data-registration-step-label="details">1. Details</li>
+      <li class="c-registration__step" data-registration-step-label="invoice">2. Invoice</li>
+      <li class="c-registration__step" data-registration-step-label="venmo">3. Venmo</li>
+      <li class="c-registration__step" data-registration-step-label="send">4. Send</li>
+    </ol>
+
+    <div class="c-registration__errors-host" data-registration-errors hidden></div>
+
+    <section class="c-registration__panel" data-registration-step-panel="details">
+      <p class="c-registration__intro">
+        Fill out your registration details. You will receive an invoice number, pay through Venmo with that invoice number in the payment note, then send the invoice by email or text so payment can be matched to your registration.
+      </p>
+
+      <form class="c-registration-form" data-registration-form autocomplete="off">
+        <div class="c-registration-form__grid">
+          <div class="c-registration-form__group">
+            <label class="c-registration-form__label" for="registration-name">Name</label>
+            <input class="c-registration-form__control" type="text" id="registration-name" name="name" required>
+          </div>
+
+          <div class="c-registration-form__group">
+            <label class="c-registration-form__label" for="registration-email">Email</label>
+            <input class="c-registration-form__control" type="email" id="registration-email" name="email" spellcheck="false" required>
+          </div>
+
+          <div class="c-registration-form__group">
+            <label class="c-registration-form__label" for="registration-phone">Phone</label>
+            <input class="c-registration-form__control" type="tel" id="registration-phone" name="phone" autocomplete="tel">
+          </div>
+
+          <div class="c-registration-form__group">
+            <label class="c-registration-form__label" for="registration-fee-key">Type of Fee</label>
+            <select class="c-registration-form__control" id="registration-fee-key" name="feeKey" required>
+              <option value="">Select payment type</option>
+            </select>
+          </div>
+
+          <div class="c-registration-form__group">
+            <label class="c-registration-form__label" for="registration-handicap">USGA Handicap Index</label>
+            <input class="c-registration-form__control" type="text" id="registration-handicap" name="usgaHandicap" inputmode="decimal" required>
+          </div>
+
+          <div class="c-registration-form__group">
+            <label class="c-registration-form__label" for="registration-venmo">Your Venmo Handle</label>
+            <input class="c-registration-form__control" type="text" id="registration-venmo" name="venmoHandle" placeholder="username without @" required>
+          </div>
+
+          <div class="c-registration-form__group">
+            <label class="c-registration-form__label" for="registration-location">Location</label>
+            <input class="c-registration-form__control" type="text" id="registration-location" name="location" required>
+          </div>
+
+          <div class="c-registration-form__group">
+            <label class="c-registration-form__label" for="registration-home-course">Home Course</label>
+            <input class="c-registration-form__control" type="text" id="registration-home-course" name="homeCourse" required>
+          </div>
+
+          <div class="c-registration-form__group c-registration-form__group--full">
+            <label class="c-registration-form__label" for="registration-social">Social Media Handles <span class="c-registration-form__optional">(optional)</span></label>
+            <input class="c-registration-form__control" type="text" id="registration-social" name="socialHandles" placeholder="@instagram, @x, LinkedIn, etc.">
+          </div>
+
+          <div class="c-registration-form__group c-registration-form__group--full">
+            <label class="c-registration-form__label" for="registration-stats">Previous Official Game Score / Stats Links <span class="c-registration-form__optional">(optional)</span></label>
+            <textarea class="c-registration-form__control c-registration-form__control--textarea" id="registration-stats" name="scoreStatsLinks" placeholder="GHIN, Golfstat, USGA, tournament results, etc."></textarea>
+          </div>
+        </div>
+
+        <div class="c-registration-form__actions">
+          <button class="c-button c-button--primary" type="button" data-registration-action="continue">Continue to Invoice</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="c-registration__panel" data-registration-step-panel="invoice" hidden>
+      <div data-registration-invoice-preview></div>
+
+      <div class="c-registration__actions">
+        <button class="c-button c-button--secondary" type="button" data-registration-action="back-details">Edit Details</button>
+        <button class="c-button c-button--secondary" type="button" data-registration-action="download-invoice">Download Invoice PDF</button>
+        <a class="c-button c-button--primary" href="#" data-registration-venmo-link data-registration-action="open-venmo">Pay through Venmo</a>
+      </div>
+
+      <p class="c-registration__note">
+        Venmo will open with the amount and invoice number prefilled in the payment note. After paying, return here to send the invoice.
+      </p>
+    </section>
+
+    <section class="c-registration__panel" data-registration-step-panel="send" hidden>
+      <p class="c-registration__summary" data-registration-send-summary></p>
+
+      <label class="c-registration__confirm">
+        <input type="checkbox" name="paymentConfirmed" value="on">
+        I completed payment through Venmo using the invoice number in the payment note.
+      </label>
+
+      <div class="c-registration__actions">
+        <a class="c-button c-button--primary" href="#" data-registration-email-link target="_blank" rel="noopener noreferrer">Email Invoice to Ryan</a>
+        <a class="c-button c-button--secondary" href="#" data-registration-sms-link>SMS Invoice to Ryan</a>
+        <button class="c-button c-button--secondary" type="button" data-registration-action="download-invoice">Download Invoice PDF</button>
+      </div>
+
+      <p class="c-registration__note">
+        Email and text include the full invoice details. Attach the downloaded PDF in your email app if you want Ryan to receive a file attachment as well.
+      </p>
+
+      <div class="c-registration-form__actions">
+        <button class="c-button c-button--primary" type="button" data-registration-action="complete">Finish Registration</button>
+      </div>
+    </section>
+
+    <section class="c-registration__panel" data-registration-step-panel="complete" hidden>
+      <div class="c-registration__complete">
+        <h2 class="c-registration__complete-title">Registration Sent</h2>
+        <p>Your invoice details were prepared. If you have not already, make sure you sent the email or text and completed payment through Venmo with the invoice number in the note.</p>
+        <a class="c-button c-button--primary" href="#/event-details">View Event Details</a>
+      </div>
+    </section>
+  </section>
+</div>

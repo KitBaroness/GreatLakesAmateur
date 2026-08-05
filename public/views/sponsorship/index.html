@@ -1,6 +1,6 @@
 <div id="page-content">
   <section class="c-page-header">
-    <h1 class="c-page-header__title">Sponsorship Opportunities</h1>
+    <h1 class="c-page-header__title">Sponsorship</h1>
   </section>
 
   <section class="c-sponsorship">
@@ -9,36 +9,51 @@
         <div class="c-sponsorship__tier">
           <h2 class="c-sponsorship__tier-title">Tournament and Website Title Sponsor</h2>
           <p class="c-sponsorship__tier-price">$3,000</p>
-          <a class="c-sponsorship__pay-link" href="mailto:yipper.rmy@gmail.com?subject=Tournament%20and%20Website%20Title%20Sponsor%20Invoice%20Request" data-payment-key="titleSponsor">Request Sponsor Invoice</a>
+          <a class="c-sponsorship__pay-link" href="#/register?fee=titleSponsor">Register</a>
         </div>
 
         <div class="c-sponsorship__tier">
           <h2 class="c-sponsorship__tier-title">Great Lakes Amateur Lunch Sponsor</h2>
           <p class="c-sponsorship__tier-price">$1,000</p>
-          <a class="c-sponsorship__pay-link" href="mailto:yipper.rmy@gmail.com?subject=Great%20Lakes%20Amateur%20Lunch%20Sponsor%20Invoice%20Request" data-payment-key="lunchSponsor">Request Sponsor Invoice</a>
+          <a class="c-sponsorship__pay-link" href="#/register?fee=lunchSponsor">Register</a>
         </div>
 
         <div class="c-sponsorship__tier">
           <h2 class="c-sponsorship__tier-title">Great Lakes Amateur Putting Green Sponsor</h2>
           <p class="c-sponsorship__tier-price">$1,000</p>
-          <a class="c-sponsorship__pay-link" href="mailto:yipper.rmy@gmail.com?subject=Great%20Lakes%20Amateur%20Putting%20Green%20Sponsor%20Invoice%20Request" data-payment-key="puttingGreenSponsor">Request Sponsor Invoice</a>
+          <a class="c-sponsorship__pay-link" href="#/register?fee=puttingGreenSponsor">Register</a>
         </div>
 
         <div class="c-sponsorship__tier">
           <h2 class="c-sponsorship__tier-title">Great Lakes Amateur Driving Range Sponsor</h2>
           <p class="c-sponsorship__tier-price">$1,000</p>
-          <a class="c-sponsorship__pay-link" href="mailto:yipper.rmy@gmail.com?subject=Great%20Lakes%20Amateur%20Driving%20Range%20Sponsor%20Invoice%20Request" data-payment-key="drivingRangeSponsor">Request Sponsor Invoice</a>
+          <a class="c-sponsorship__pay-link" href="#/register?fee=drivingRangeSponsor">Register</a>
         </div>
       </div>
     </div>
 
-    <div class="c-sponsorship__payment-note">
-      <p>Sponsor payments are handled by invoice so logo placement, signage, and deliverables can be confirmed before payment.</p>
-      <div class="c-contact-actions c-contact-actions--centered">
-        <a class="c-contact-actions__link" href="sms:+13309907738?body=Great%20Lakes%20Amateur%20sponsorship%20inquiry" data-contact-action="smsSponsorship">Text About Sponsorship</a>
-        <a class="c-contact-actions__link" href="mailto:yipper.rmy@gmail.com?subject=Great%20Lakes%20Amateur%20Sponsorship%20Inquiry" data-contact-action="emailSponsorship">Email Sponsorship Inquiry</a>
+    <section class="c-sponsor-carousel" data-sponsorship-showcase aria-label="Sponsor logos">
+      <div class="c-sponsor-carousel__header">
+        <p class="c-sponsor-carousel__eyebrow">Partners</p>
+        <p class="c-sponsor-carousel__intro">Featured partners supporting the Great Lakes Amateur and Michigan Players Golf Club.</p>
       </div>
-    </div>
+
+      <div class="c-sponsor-carousel__frame">
+        <button class="c-sponsor-carousel__control c-sponsor-carousel__control--prev" type="button" data-sponsor-carousel-prev aria-label="Previous sponsor">
+          ‹
+        </button>
+
+        <div class="c-sponsor-carousel__track-wrap" data-sponsor-carousel-track-wrap>
+          <div class="c-sponsor-carousel__track" data-sponsor-carousel-track></div>
+        </div>
+
+        <button class="c-sponsor-carousel__control c-sponsor-carousel__control--next" type="button" data-sponsor-carousel-next aria-label="Next sponsor">
+          ›
+        </button>
+      </div>
+
+      <div class="c-sponsor-carousel__dots" data-sponsor-carousel-dots aria-label="Sponsor carousel pagination"></div>
+    </section>
 
     <div class="c-sponsorship__details">
       <h2 class="c-sponsorship__heading">What does your sponsorship get you?</h2>
@@ -67,9 +82,18 @@
         </article>
       </div>
 
-      <p class="c-sponsorship__action">
-        <a class="c-button c-button--primary" href="#/contact">Contact Us</a>
-      </p>
+      <section class="c-sponsor-testimonials" aria-label="Sponsor testimonials">
+        <div class="c-sponsor-testimonials__header">
+          <p class="c-sponsor-testimonials__eyebrow">Testimonials</p>
+          <h2 class="c-sponsor-testimonials__heading">What People Are Saying</h2>
+        </div>
+        <div class="c-sponsor-testimonials__grid" data-sponsor-testimonials-list></div>
+      </section>
+
+      <div class="c-sponsorship__action">
+        <p class="c-sponsorship__payment-note">Sponsor payments use the registration form with invoice number, Venmo payment details, and your sponsorship selection.</p>
+        <a class="c-button c-button--primary" href="#/register">Register</a>
+      </div>
     </div>
   </section>
 </div>

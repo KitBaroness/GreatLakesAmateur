@@ -27,7 +27,8 @@ const templateCache = createTemplateCache();
 export const normalizePath = (path) => {
   const raw = String(path || '').trim();
   const withoutHash = raw.startsWith('#') ? raw.slice(1) : raw;
-  const withSlash = withoutHash.startsWith('/') ? withoutHash : `/${withoutHash}`;
+  const pathOnly = withoutHash.split('?')[0].split('#')[0];
+  const withSlash = pathOnly.startsWith('/') ? pathOnly : `/${pathOnly}`;
   return withSlash.length > 1 && withSlash.endsWith('/') ? withSlash.slice(0, -1) : withSlash;
 };
 

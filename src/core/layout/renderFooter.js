@@ -2,6 +2,8 @@
  * Footer renderer.
  */
 
+import { escapeHtml } from '../../utilities/escapeHtml.js';
+
 /**
  * @pure
  * @param {Object} config
@@ -12,7 +14,7 @@ export const createFooterMarkup = (config) => {
 
   return `
     <div class="c-site-footer__inner">
-      <p class="c-site-footer__text">${footer.copyright}</p>
+      <p class="c-site-footer__text">${escapeHtml(footer.copyright)}</p>
     </div>
   `.trim();
 };

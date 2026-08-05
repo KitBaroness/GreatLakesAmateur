@@ -1,14 +1,18 @@
 <div id="page-content">
   <section class="c-page-header">
     <h1 class="c-page-header__title">Contact</h1>
-    <p class="c-page-header__subtitle">Tournament questions, sponsorships, and payment coordination</p>
+    <p class="c-page-header__subtitle">Location, tournament committee, and payment registration</p>
   </section>
 
   <section class="c-contact">
     <p class="c-contact__intro">
-      Reach out to the tournament committee for player registration, payment options, sponsorship coordination,
-      or general Great Lakes Amateur information.
+      Tournament entry, sponsorship, and membership payments are handled through
+      <a href="#/register">Register</a>. Use the direct contact options below for general questions.
     </p>
+
+    <div class="c-contact__register-callout">
+      <a class="c-button c-button--primary" href="#/register?fee=entryFee">Register</a>
+    </div>
 
     <section class="c-location-map" aria-labelledby="location-map-heading">
       <div class="c-location-map__header">
@@ -21,27 +25,6 @@
         <div class="c-location-map__locations" data-map-location-list aria-label="Event location and nearby hotels"></div>
       </div>
     </section>
-
-    <form class="c-contact-form" autocomplete="off" data-contact-form data-transient-form>
-      <div class="c-contact-form__group">
-        <label class="c-contact-form__label" for="name">Name</label>
-        <input class="c-contact-form__control" type="text" id="name" name="name" autocomplete="off" required>
-      </div>
-
-      <div class="c-contact-form__group">
-        <label class="c-contact-form__label" for="email">Email</label>
-        <input class="c-contact-form__control" type="email" id="email" name="email" autocomplete="off" spellcheck="false" required>
-      </div>
-
-      <div class="c-contact-form__group">
-        <label class="c-contact-form__label" for="message">Message</label>
-        <textarea class="c-contact-form__control c-contact-form__control--textarea" id="message" name="message" autocomplete="off" spellcheck="true" required></textarea>
-      </div>
-
-      <div class="c-contact-form__actions">
-        <button class="c-button c-button--primary" type="submit">Send Message</button>
-      </div>
-    </form>
 
     <div class="c-contact__info">
       <h2 class="c-contact__heading">Contact Information</h2>
