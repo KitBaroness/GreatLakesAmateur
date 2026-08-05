@@ -112,7 +112,7 @@ export const validateRegistrationForm = (form) => {
   if (!form.usgaHandicap) errors.push('USGA handicap index is required.');
   if (!form.location) errors.push('Location is required.');
   if (!form.homeCourse) errors.push('Home course is required.');
-  if (!form.venmoHandle) errors.push('Your Venmo handle is required so Ryan can match your payment.');
+  if (!form.venmoHandle) errors.push('Your Venmo handle is required so we are able to match your payment.');
 
   return errors;
 };
