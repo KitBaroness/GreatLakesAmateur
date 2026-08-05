@@ -107,7 +107,6 @@ const closeMobileNavigation = () => {
   toggle.classList.remove('c-site-header__toggle--open');
   toggle.setAttribute('aria-expanded', 'false');
   nav.hidden = true;
-  nav.classList.remove('c-mobile-nav--open');
 };
 
 /**
@@ -124,7 +123,6 @@ const toggleMobileNavigation = () => {
   toggle.classList.toggle('c-site-header__toggle--open', !isOpen);
   toggle.setAttribute('aria-expanded', String(!isOpen));
   nav.hidden = isOpen;
-  nav.classList.toggle('c-mobile-nav--open', !isOpen);
 };
 
 /**

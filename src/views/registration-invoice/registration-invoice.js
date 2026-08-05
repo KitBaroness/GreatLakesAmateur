@@ -491,10 +491,16 @@ export const downloadRegistrationInvoicePdf = async (config, draft) => {
 const hydrateRegistrationView = (config, root, draft) => {
   const form = root.querySelector(REGISTRATION_FORM_SELECTOR);
   const feeSelect = form?.elements.namedItem('feeKey');
+  const queryFee = getHashQueryParams().fee;
+  const requestedFee = queryFee && window.FlexNetSiteConfig.getRegistrationFeeOption(config, queryFee)
+    ? queryFee
+    : '';
+  // A fee chosen from a tier link outranks the stored draft so sponsorship
+  // selections are not silently replaced by an earlier in-progress fee.
+  const feeChanged = Boolean(requestedFee && draft && draft.feeKey !== requestedFee);
 
-  if (feeSelect && feeSelect instanceof HTMLSelectElement) {
-    const queryFee = getHashQueryParams().fee;
-    const selectedKey = draft?.feeKey || queryFee || feeSelect.value;
+  if (feeSelect instanceof HTMLSelectElement) {
+    const selectedKey = requestedFee || draft?.feeKey || feeSelect.value;
     feeSelect.innerHTML = `<option value="">Select payment type</option>${createFeeOptionsMarkup(
       window.FlexNetSiteConfig.getRegistrationFeeOptions(config),
       selectedKey
@@ -504,11 +510,15 @@ const hydrateRegistrationView = (config, root, draft) => {
   if (draft) {
     if (form) {
       populateRegistrationForm(form, draft);
+
+      if (feeChanged && feeSelect instanceof HTMLSelectElement) {
+        feeSelect.value = requestedFee;
+      }
     }
 
     renderInvoiceStep(config, root, draft);
     renderSendStep(config, root, draft);
-    showRegistrationStep(root, draft.step);
+    showRegistrationStep(root, feeChanged ? 'details' : draft.step);
     return;
   }
 

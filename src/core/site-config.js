@@ -43,17 +43,6 @@
 
   /**
    * @pure
-   * @param {String} amount
-   * @returns {Number}
-   */
-  const parseAmountNumeric = (amount) => {
-    const digits = String(amount || '').replace(/[^\d.]/g, '');
-    const value = Number.parseFloat(digits);
-    return Number.isFinite(value) ? value : 0;
-  };
-
-  /**
-   * @pure
    * @param {Object} params
    * @returns {String}
    */
@@ -113,22 +102,6 @@
     ].join('\n')
   };
 
-  /**
-   * @pure
-   * @param {Object} params
-   * @returns {String}
-   */
-  const buildSponsorInvoiceLink = ({ label, amount }) => {
-    const subject = `${label} Invoice Request`;
-    const body = [
-      `I would like to sponsor the Great Lakes Amateur as the ${label} for ${amount}.`,
-      '',
-      'Please send payment instructions and sponsorship next steps.'
-    ].join('\n');
-
-    return buildMailtoLink({ subject, body });
-  };
-
   const siteConfig = deepFreeze({
     version: '2.0.0',
     brand: {
@@ -137,11 +110,6 @@
       logo: 'assets/images/logo.jpg',
       logoAlt: 'Michigan Players Amateur',
       homeRoute: '/home'
-    },
-    assets: {
-      hero: 'assets/images/hero.jpeg',
-      sidebar: 'assets/images/sidebar.jpg',
-      payButton: 'assets/images/pay-button.png'
     },
     callsToAction: [
       {
@@ -564,13 +532,6 @@
   /**
    * @pure
    * @param {Object} config
-   * @returns {Object}
-   */
-  const getAssets = (config) => config.assets;
-
-  /**
-   * @pure
-   * @param {Object} config
    * @returns {Array}
    */
   const getCallsToAction = (config) => config.callsToAction;
@@ -689,24 +650,12 @@
     ]);
   };
 
-  /**
-   * @pure
-   * @param {Object} config
-   * @param {String} path
-   * @returns {Object|null}
-   */
-  const findPageByRoute = (config, path) => {
-    const routes = buildRoutes(config);
-    return routes.find((route) => route.path === path) || null;
-  };
-
   const SiteConfig = deepFreeze({
     config: siteConfig,
     deepFreeze,
     getNavigation,
     getDefaultRoute,
     getBrand,
-    getAssets,
     getCallsToAction,
     getFooter,
     getDeveloperSignature,
@@ -719,13 +668,11 @@
     getSponsorshipShowcase,
     buildGoogleMapsSearchLink,
     buildVenmoPaymentUrl,
-    parseAmountNumeric,
     buildMailtoLink,
     buildSmsLink,
     getContactAction,
     getPaymentOption,
-    buildRoutes,
-    findPageByRoute
+    buildRoutes
   });
 
   window.FlexNetSiteConfig = SiteConfig;

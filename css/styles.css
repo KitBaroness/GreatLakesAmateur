@@ -1295,10 +1295,6 @@ textarea:focus-visible {
   justify-content: flex-start;
 }
 
-.c-contact-actions--centered {
-  margin-top: 16px;
-}
-
 .c-contact-actions__link,
 .c-content .c-contact-actions__link {
   display: inline-flex;
@@ -1337,79 +1333,6 @@ textarea:focus-visible {
 
 .c-inline-contact__summary {
   margin: 0;
-}
-
-.c-contact-form {
-  padding: 28px;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-soft);
-  text-align: left;
-}
-
-.c-contact-form__group {
-  margin-bottom: 20px;
-}
-
-.c-contact-form__label {
-  display: block;
-  margin-bottom: 6px;
-  color: var(--color-lake);
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.c-contact-form__control {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  color: var(--color-ink);
-  background: var(--color-surface);
-  font-size: 16px;
-  transition: border-color 160ms ease, box-shadow 160ms ease;
-}
-
-.c-contact-form__control:focus {
-  outline: none;
-  border-color: var(--color-fairway);
-  box-shadow: 0 0 0 3px rgba(47, 93, 68, 0.12);
-}
-
-.c-contact-form__control--textarea {
-  min-height: 132px;
-  resize: vertical;
-}
-
-.c-contact-form__actions {
-  margin-top: 24px;
-  text-align: center;
-}
-
-.c-placeholder {
-  width: min(100%, 720px);
-  margin: 0 auto;
-  padding: 82px 24px;
-  text-align: center;
-}
-
-.c-placeholder__title {
-  margin: 0 0 12px;
-  color: var(--color-lake);
-  font-family: var(--font-heading);
-  font-size: 2.3rem;
-  font-weight: 650;
-  line-height: 1.18;
-}
-
-.c-placeholder__text {
-  margin: 0;
-  color: var(--color-muted);
-  font-size: 1.04rem;
-}
-
-.c-placeholder__action {
-  margin: 26px 0 0;
 }
 
 .c-activities {
@@ -1691,7 +1614,6 @@ textarea:focus-visible {
   text-transform: uppercase;
 }
 
-.c-sponsor-carousel__heading,
 .c-sponsor-testimonials__heading {
   margin: 0 0 10px;
   color: var(--color-lake);
@@ -2075,13 +1997,8 @@ textarea:focus-visible {
     margin-bottom: 36px;
   }
 
-  .c-placeholder__title {
-    font-size: 1.75rem;
-  }
-
   .c-content,
   .c-contact,
-  .c-placeholder,
   .c-activities,
   .c-sponsorship__details {
     padding-right: 18px;
@@ -2117,7 +2034,6 @@ textarea:focus-visible {
 
   .c-event-meta,
   .c-location-map__header,
-  .c-contact-form,
   .c-contact__info {
     padding: 22px 18px;
   }
@@ -2248,7 +2164,6 @@ textarea:focus-visible {
 
   .c-content,
   .c-contact,
-  .c-placeholder,
   .c-activities,
   .c-sponsorship__details,
   .c-event-details {
@@ -2266,7 +2181,6 @@ textarea:focus-visible {
   .c-activity-highlights,
   .c-event-meta,
   .c-location-map__header,
-  .c-contact-form,
   .c-contact__info,
   .c-inline-contact {
     padding-right: 16px;
@@ -2380,6 +2294,10 @@ textarea:focus-visible {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+}
+
+.c-registration-form__group {
+  min-width: 0;
 }
 
 .c-registration-form__group--full {
