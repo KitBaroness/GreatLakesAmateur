@@ -12,10 +12,17 @@ import SiteConfig from '../site-config.js';
  */
 const createFooterMarkup = (config) => {
   const footer = SiteConfig.getFooter(config);
+  const legal = footer.legal;
 
   return `
     <div class="c-site-footer__inner">
       <p class="c-site-footer__text">${escapeHtml(footer.copyright)}</p>
+      ${legal ? `
+      <p class="c-site-footer__meta">
+        <a class="c-site-footer__link" href="${escapeHtml(legal.licenseHref)}">${escapeHtml(legal.licenseLabel)}</a>
+        <span class="c-site-footer__separator" aria-hidden="true"> · </span>
+        <span>${escapeHtml(legal.architectureCredit)}</span>
+      </p>` : ''}
     </div>
   `.trim();
 };

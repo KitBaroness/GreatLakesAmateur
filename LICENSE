@@ -1,0 +1,173 @@
+FlexNet Template License 1.0
+
+This repository contains two separately owned bodies of work:
+
+  FlexNet Architecture Code
+    Copyright (c) 2026 Kit Baroness
+
+  Site Content and Assets
+    Copyright (c) 2026 Michigan Players Golf Club
+    Principal: Ryan Yip
+
+Permission to use FlexNet Architecture Code as a template is granted by Kit
+Baroness under the terms below. Site Content is owned by Michigan Players Golf
+Club and is not licensed for public reuse except as stated in Section 2.
+
+
+================================================================================
+1. FLEXNET ARCHITECTURE CODE (PERMITTED TEMPLATE USE)
+================================================================================
+
+FlexNet Architecture Code is licensed by Kit Baroness and includes:
+
+  - The overall project structure and runtime pattern (shell + hash router +
+    view fragments + ES module loader + frozen site config)
+  - Files and folders whose primary purpose is runtime architecture, including
+    but not limited to:
+      src/core/loader.js
+      src/core/site-config.js (structure and helper patterns, not site data)
+      src/core/layout/
+      src/utilities/
+      src/views/ (module patterns and interaction logic, not site copy)
+      css/styles.css (BEM component structure and layout patterns)
+      scripts/serve.py
+      scripts/check.sh
+      _headers and _redirects (as deployment pattern examples)
+      index.html shell markup and module bootstrap (not inline page content)
+  - The example/ directory, when present, as reference material only
+
+You MAY, for any purpose including commercial projects:
+
+  - Use, copy, modify, and merge FlexNet Architecture Code
+  - Create derivative works based on FlexNet Architecture Code
+  - Use the code as a template or example for other static sites
+  - Deploy sites built from FlexNet Architecture Code
+
+You MUST:
+
+  - Include a copy of this license (or a clear link to it) in any substantial
+    redistribution of FlexNet Architecture Code
+  - Retain attribution to Kit Baroness and the FlexNet JSX architecture in
+    source files you copy verbatim, or in your project README / LICENSE if files
+    are heavily rewritten
+  - Replace site-specific branding, copy, images, and configuration with your
+    own content before publishing a public site
+
+You MAY NOT:
+
+  - Remove or obscure FlexNet attribution from copied architecture files
+  - Represent your project as an official FlexNet product or endorsement by
+    Kit Baroness without written permission
+  - Republish this repository, or a substantially unchanged copy of it, as a
+    competing template marketplace product without written permission
+
+
+================================================================================
+2. SITE CONTENT AND ASSETS (LIMITED USE)
+================================================================================
+
+Site Content is owned by Michigan Players Golf Club (Principal: Ryan Yip) and
+includes everything not listed as FlexNet Architecture Code above, including but
+not limited to:
+
+  - Michigan Players Golf Club and Great Lakes Amateur names, logos, and marks
+  - Tournament copy, schedules, prizes, sponsorship tiers, and contact details
+  - Images and media under assets/, including sponsor and partner marks
+  - View fragment markup and text under public/views/
+  - Inline page content in index.html (for example the home hero shell)
+  - Legacy redirect shells (contact.html, event-details.html, and related files)
+  - Site-specific values inside src/core/site-config.js
+  - SEO metadata, JSON-LD, robots.txt, sitemap.xml, and social preview assets
+    tied to michiganplayersgolfclub.com
+  - Testimonials, quotes, and third-party marks reproduced as part of the site
+
+Site Content is provided as part of this example site only.
+
+You MAY:
+
+  - View and study Site Content while learning FlexNet Architecture Code
+  - Keep Site Content unchanged while working locally on a private fork
+
+You MAY NOT, without separate written permission from Michigan Players Golf
+Club (Principal: Ryan Yip):
+
+  - Reuse Site Content in another public website, product, or marketing material
+  - Use Michigan Players Golf Club or Great Lakes Amateur branding, logos, or
+    tournament copy for any other project
+  - Redistribute Site Content as stock assets, templates, or downloadable packs
+  - Imply endorsement, sponsorship, or official affiliation with Michigan
+    Players Golf Club or the Great Lakes Amateur except as authorized in writing
+
+
+================================================================================
+3. THIRD-PARTY COMPONENTS AND MARKS
+================================================================================
+
+This project may load third-party libraries and services (for example Leaflet,
+jsPDF, OpenStreetMap tiles, Cloudflare, and CDN-hosted scripts). Those
+components remain subject to their own licenses and terms of use. See NOTICE
+for attribution details.
+
+Sponsor logos, partner marks, publication excerpts, and other third-party
+materials appearing in Site Content remain the property of their respective
+owners. This license does not grant any rights to those materials.
+
+
+================================================================================
+4. NO TRADEMARK LICENSE
+================================================================================
+
+This license does not grant permission to use the names "FlexNet", "FlexNet JSX",
+"Kit Baroness", "Michigan Players Golf Club", "Ryan Yip", or "Great Lakes
+Amateur" except as required for reasonable attribution under Section 1 or as
+authorized in writing by the respective rights holder.
+
+
+================================================================================
+5. TERMINATION
+================================================================================
+
+Permission granted under Section 1 terminates automatically if you breach Section
+1 or Section 2 and do not cure the breach within 30 days of written notice from
+Kit Baroness or Michigan Players Golf Club (Principal: Ryan Yip), where a cure is
+reasonably possible.
+
+Upon termination, you must stop distributing FlexNet Architecture Code except as
+already incorporated into a permitted derivative work that complies with this
+license, and you must cease all use of Site Content.
+
+
+================================================================================
+6. GOVERNING LAW AND SEVERABILITY
+================================================================================
+
+This license is governed by the laws of the State of Michigan, United States,
+without regard to conflict-of-law rules.
+
+If any provision of this license is held unenforceable, the remaining provisions
+remain in effect.
+
+
+================================================================================
+7. DISCLAIMER
+================================================================================
+
+THE SOFTWARE AND EXAMPLE SITE ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO
+EVENT SHALL KIT BARONESS, MICHIGAN PLAYERS GOLF CLUB, RYAN YIP, OR OTHER
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+================================================================================
+8. QUESTIONS
+================================================================================
+
+FlexNet Architecture Code and permitted template use:
+  Kit Baroness (@KitBaroness)
+
+Site Content, tournament branding, and reuse permissions:
+  Michigan Players Golf Club
+  Principal: Ryan Yip

@@ -485,7 +485,12 @@ const deepFreeze = (value) => {
       }
     },
     footer: {
-      copyright: '© 2026 Michigan Players Golf Club. Great Lakes Amateur.'
+      copyright: '© 2026 Michigan Players Golf Club. Great Lakes Amateur.',
+      legal: {
+        licenseHref: '/LICENSE',
+        licenseLabel: 'License & legal',
+        architectureCredit: 'FlexNet architecture © Kit Baroness'
+      }
     },
     developerSignature: {
       enabled: true,

@@ -33,6 +33,8 @@ for path in \
   /index.html \
   /robots.txt \
   /sitemap.xml \
+  /LICENSE \
+  /NOTICE \
   /css/styles.css \
   /src/core/site-config.js \
   /src/core/loader.js \

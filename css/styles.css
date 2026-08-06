@@ -1855,6 +1855,23 @@ textarea:focus-visible {
   font-size: 13px;
 }
 
+.c-site-footer__meta {
+  margin: 10px 0 0;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 12px;
+}
+
+.c-site-footer__link {
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.c-site-footer__link:hover,
+.c-site-footer__link:focus-visible {
+  color: #fff;
+}
+
 .u-legacy-page {
   display: grid;
   min-height: 100vh;
@@ -2302,9 +2319,15 @@ textarea:focus-visible {
 
 .c-registration__intro,
 .c-registration__note,
-.c-registration__summary {
+.c-registration__summary,
+.c-registration__legal {
   margin: 0 0 22px;
   color: var(--color-muted);
+}
+
+.c-registration__legal {
+  font-size: 0.92rem;
+  line-height: 1.55;
 }
 
 .c-registration__errors-host:not([hidden]) {

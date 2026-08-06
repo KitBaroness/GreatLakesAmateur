@@ -1,0 +1,43 @@
+Third-Party Notices
+===================
+
+This project includes or may load third-party software and services. The
+materials below are governed by their own licenses and terms.
+
+
+Leaflet 1.9.4
+-------------
+Used on the contact page map when that route is visited.
+License: BSD 2-Clause License
+Project: https://leafletjs.com/
+Loaded from: unpkg.com and/or cdn.jsdelivr.net
+
+
+jsPDF 2.5.1
+-----------
+Used for optional registration invoice PDF download when requested.
+License: MIT License
+Project: https://github.com/parallax/jsPDF
+Loaded from: cdnjs.cloudflare.com
+
+
+OpenStreetMap
+-------------
+Map tiles and attribution data used by Leaflet on the contact page.
+License: Open Database License (ODbL) 1.0 for data; tile usage subject to
+OpenStreetMap Foundation tile policy.
+Project: https://www.openstreetmap.org/copyright
+
+
+Cloudflare Pages / CDN
+----------------------
+Production hosting, edge caching, security headers, and optional managed
+robots.txt behavior are provided by Cloudflare when deployed there.
+Terms: https://www.cloudflare.com/website-terms/
+
+
+Third-Party Marks In Site Content
+---------------------------------
+Sponsor logos, partner marks, publication names, and quoted material reproduced
+in Site Content belong to their respective owners. See LICENSE Section 2 and
+Section 3. No rights to those marks are granted by this repository.

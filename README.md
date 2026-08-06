@@ -4,6 +4,28 @@ This repository is a static replication of [michiganplayersgolfclub.com](https:/
 
 FlexNet JSX was created by `@KitBaroness`. Questions about the FlexNet architecture can be commented to her.
 
+## Legal
+
+This repository uses the **FlexNet Template License 1.0** ([LICENSE](LICENSE)).
+Third-party attributions are listed in [NOTICE](NOTICE).
+
+### Ownership
+
+| Work | Rights holder | Use |
+|------|---------------|-----|
+| **FlexNet Architecture Code** | Kit Baroness | May be reused as a template with attribution (see LICENSE Section 1) |
+| **Site Content and Assets** | Michigan Players Golf Club (Principal: Ryan Yip) | Example site material only; no public reuse without written permission (see LICENSE Section 2) |
+
+### Summary
+
+- **FlexNet Architecture Code** (router, loader, config patterns, utilities, BEM structure, scripts) may be used as a template or example, including for commercial sites, with attribution.
+- **Site Content and Assets** (Michigan Players Golf Club / Great Lakes Amateur branding, copy, images, tournament data, sponsor marks, and view text) may not be reused publicly without permission from Michigan Players Golf Club (Principal: Ryan Yip).
+- The live site footer links to `/LICENSE` and credits FlexNet architecture separately from club copyright.
+
+See [LICENSE](LICENSE) and [NOTICE](NOTICE) for full terms, third-party notices, termination, and governing law.
+
+> This is not legal advice. For contractual client work, keep written permission from Michigan Players Golf Club for portfolio and repository publication.
+
 ## Architecture
 
 This project intentionally uses:
