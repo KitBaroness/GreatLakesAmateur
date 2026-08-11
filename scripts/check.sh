@@ -40,7 +40,10 @@ for path in \
   /src/core/loader.js \
   /src/utilities/routeViewModules.js \
   /assets/images/hero-430.avif \
-  /assets/images/hero-430.webp \
+  /assets/images/summer-golf-camp.webp \
+  /assets/images/summer-golf-camp.jpg \
+  /assets/images/golf-lesson.avif \
+  /assets/images/golf-lesson.jpg \
   /assets/images/favicon.ico \
   /assets/images/og-image.jpg \
   /public/views/home/index.html \
