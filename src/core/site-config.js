@@ -504,7 +504,7 @@ const deepFreeze = (value) => {
       legal: {
         triggerLabel: 'Terms of use',
         dialogTitle: 'Website Terms of Use',
-        intro: 'Using this website means you accept these terms. If you do not agree, do not use the site.',
+        intro: 'By using this website you accept these terms.',
         closingNote: 'Last updated August 2026. Michigan Players Golf Club may revise these terms at any time. Continued use constitutes acceptance.',
         sections: [
           {
