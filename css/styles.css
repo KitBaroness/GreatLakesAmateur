@@ -2395,6 +2395,11 @@ textarea:focus-visible {
   font: inherit;
 }
 
+.c-registration-form__control--fee {
+  max-width: 100%;
+  text-overflow: ellipsis;
+}
+
 .c-registration-form__control:focus {
   outline: none;
   border-color: var(--color-fairway);

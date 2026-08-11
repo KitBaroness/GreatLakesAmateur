@@ -344,15 +344,38 @@ const createInvoicePreviewMarkup = (config, draft) => `
 
 /**
  * @pure
+ * @param {Object} option
+ * @returns {String}
+ */
+const formatFeeOptionSelectLabel = (option) => (
+  `${option.amount} — ${option.shortLabel || option.label}`
+);
+
+/**
+ * @pure
  * @param {Array} feeOptions
  * @param {String} selectedKey
  * @returns {String}
  */
-const createFeeOptionsMarkup = (feeOptions, selectedKey = '') => (
-  feeOptions.map((option) => (
-    `<option value="${escapeHtml(option.key)}"${option.key === selectedKey ? ' selected' : ''}>${escapeHtml(option.label)} (${escapeHtml(option.amount)})</option>`
-  )).join('')
-);
+const createFeeOptionsMarkup = (feeOptions, selectedKey = '') => {
+  const groups = new Map();
+
+  feeOptions.forEach((option) => {
+    const category = option.category || 'Other';
+
+    if (!groups.has(category)) {
+      groups.set(category, []);
+    }
+
+    groups.get(category).push(option);
+  });
+
+  return [...groups.entries()].map(([category, options]) => (
+    `<optgroup label="${escapeHtml(category)}">${options.map((option) => (
+      `<option value="${escapeHtml(option.key)}"${option.key === selectedKey ? ' selected' : ''} title="${escapeHtml(option.label)}">${escapeHtml(formatFeeOptionSelectLabel(option))}</option>`
+    )).join('')}</optgroup>`
+  )).join('');
+};
 
 /**
  * @effect

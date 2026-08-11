@@ -325,6 +325,7 @@ const deepFreeze = (value) => {
       entryFee: {
         key: 'entryFee',
         label: 'Great Lakes Amateur Entry Fee',
+        shortLabel: 'Entry Fee',
         amount: '$299',
         amountNumeric: 299,
         category: 'Tournament Entry',
@@ -334,9 +335,23 @@ const deepFreeze = (value) => {
         provider: 'Venmo',
         external: false
       },
+      practiceRound: {
+        key: 'practiceRound',
+        label: 'Pre-Tournament Practice Round — Sunday, August 16, 2026 (after 2:00 PM)',
+        shortLabel: 'Practice Round (Sun Aug 16)',
+        amount: '$50',
+        amountNumeric: 50,
+        category: 'Practice Round',
+        checkoutLabel: 'Pay Practice Round',
+        checkoutUrl: '',
+        checkoutMode: 'registration',
+        provider: 'Venmo',
+        external: false
+      },
       membership: {
         key: 'membership',
         label: 'Michigan Players Golf Club Membership',
+        shortLabel: 'MPGC Membership',
         amount: '$150',
         amountNumeric: 150,
         category: 'Membership',
@@ -350,6 +365,7 @@ const deepFreeze = (value) => {
         titleSponsor: {
           key: 'titleSponsor',
           label: 'Tournament and Website Title Sponsor',
+          shortLabel: 'Title Sponsor',
           amount: '$3,000',
           amountNumeric: 3000,
           category: 'Sponsorship',
@@ -362,6 +378,7 @@ const deepFreeze = (value) => {
         lunchSponsor: {
           key: 'lunchSponsor',
           label: 'Great Lakes Amateur Lunch Sponsor',
+          shortLabel: 'Lunch Sponsor',
           amount: '$1,000',
           amountNumeric: 1000,
           category: 'Sponsorship',
@@ -374,6 +391,7 @@ const deepFreeze = (value) => {
         puttingGreenSponsor: {
           key: 'puttingGreenSponsor',
           label: 'Great Lakes Amateur Putting Green Sponsor',
+          shortLabel: 'Putting Green Sponsor',
           amount: '$1,000',
           amountNumeric: 1000,
           category: 'Sponsorship',
@@ -386,6 +404,7 @@ const deepFreeze = (value) => {
         drivingRangeSponsor: {
           key: 'drivingRangeSponsor',
           label: 'Great Lakes Amateur Driving Range Sponsor',
+          shortLabel: 'Driving Range Sponsor',
           amount: '$1,000',
           amountNumeric: 1000,
           category: 'Sponsorship',
@@ -606,6 +625,7 @@ const deepFreeze = (value) => {
 
     return [
       payments.entryFee,
+      payments.practiceRound,
       payments.membership,
       ...Object.keys(sponsorships).map((key) => sponsorships[key])
     ].filter(Boolean);
