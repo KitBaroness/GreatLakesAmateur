@@ -4,6 +4,7 @@
 
 import { escapeHtml } from '../../utilities/escapeHtml.js';
 import SiteConfig from '../site-config.js';
+import { bindLegalDialog, createLegalDialogMarkup, LEGAL_DIALOG_ID } from './renderLegalDialog.js';
 
 /**
  * @pure
@@ -19,9 +20,7 @@ const createFooterMarkup = (config) => {
       <p class="c-site-footer__text">${escapeHtml(footer.copyright)}</p>
       ${legal ? `
       <p class="c-site-footer__meta">
-        <a class="c-site-footer__link" href="${escapeHtml(legal.licenseHref)}">${escapeHtml(legal.licenseLabel)}</a>
-        <span class="c-site-footer__separator" aria-hidden="true"> · </span>
-        <span>${escapeHtml(legal.architectureCredit)}</span>
+        <button type="button" class="c-site-footer__link c-site-footer__legal-trigger" data-legal-dialog-open>${escapeHtml(legal.triggerLabel)}</button>
       </p>` : ''}
     </div>
   `.trim();
@@ -36,5 +35,12 @@ export const renderFooter = (config) => {
   const host = document.getElementById('site-footer');
   if (!host) return;
 
+  const footer = SiteConfig.getFooter(config);
   host.innerHTML = createFooterMarkup(config);
+
+  if (footer.legal && !document.getElementById(LEGAL_DIALOG_ID)) {
+    host.insertAdjacentHTML('beforeend', createLegalDialogMarkup(footer.legal));
+  }
+
+  bindLegalDialog();
 };

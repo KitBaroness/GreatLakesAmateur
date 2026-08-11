@@ -1,6 +1,7 @@
 import SiteConfig from './site-config.js';
 import { renderHeader } from './layout/renderHeader.js';
 import { renderFooter } from './layout/renderFooter.js';
+import { closeLegalDialog } from './layout/renderLegalDialog.js';
 import { createRouter, getPathFromHash } from '../utilities/router.js';
 import { hydrateRouteViews } from '../utilities/routeViewModules.js';
 
@@ -129,90 +130,6 @@ const toggleMobileNavigation = () => {
 /**
  * @effect
  * @param {HTMLAnchorElement} link
- * @param {Object} payment
- * @returns {void}
- */
-const hydratePaymentLink = (link, payment) => {
-  if (payment.checkoutMode === 'registration') {
-    const label = payment.checkoutLabel || payment.label;
-    link.setAttribute('href', `#/register?fee=${encodeURIComponent(payment.key)}`);
-    link.setAttribute('title', `${label} - ${payment.label} ${payment.amount}`.trim());
-    link.setAttribute('aria-label', `${label} - ${payment.label} ${payment.amount}`.trim());
-    link.setAttribute('data-payment-status', 'registration');
-    link.removeAttribute('target');
-    link.removeAttribute('rel');
-    return;
-  }
-
-  const url = payment.checkoutUrl;
-  const label = payment.checkoutLabel || payment.label;
-  const title = `${label} - ${payment.label} ${payment.amount}`.trim();
-  const isExternalPage = payment.external && payment.checkoutMode !== 'iframe' && /^https?:\/\//i.test(url);
-
-  link.setAttribute('href', url);
-  link.setAttribute('title', title);
-  link.setAttribute('aria-label', title);
-  link.setAttribute('data-payment-status', 'ready');
-
-  if (isExternalPage) {
-    link.setAttribute('target', '_blank');
-    link.setAttribute('rel', 'noopener noreferrer');
-  } else {
-    link.removeAttribute('target');
-    link.removeAttribute('rel');
-  }
-
-  const labelTarget = link.querySelector('[data-payment-label-target]');
-  const image = link.querySelector('img');
-  const shouldPreserveLabel = link.hasAttribute('data-payment-preserve-label');
-
-  if (labelTarget) {
-    labelTarget.textContent = label;
-  } else if (!image && label && !shouldPreserveLabel) {
-    link.textContent = label;
-  }
-
-  if (image) {
-    image.setAttribute('alt', label);
-  }
-};
-
-/**
- * @effect
- * @param {HTMLAnchorElement} link
- * @returns {void}
- */
-const markPaymentLinkUnconfigured = (link) => {
-  link.setAttribute('href', '#');
-  link.setAttribute('data-payment-status', 'unconfigured');
-  link.removeAttribute('target');
-  link.removeAttribute('rel');
-};
-
-/**
- * @effect
- * @param {Object} config
- * @returns {void}
- */
-const hydratePaymentLinks = (config) => {
-  const getPaymentOption = SiteConfig.getPaymentOption;
-
-  document.querySelectorAll('[data-payment-key]').forEach((link) => {
-    const key = link.getAttribute('data-payment-key');
-    const payment = getPaymentOption ? getPaymentOption(config, key) : null;
-
-    if (payment?.checkoutUrl) {
-      hydratePaymentLink(link, payment);
-      return;
-    }
-
-    markPaymentLinkUnconfigured(link);
-  });
-};
-
-/**
- * @effect
- * @param {HTMLAnchorElement} link
  * @param {Object} action
  * @returns {void}
  */
@@ -251,51 +168,11 @@ const hydrateContactLinks = (config) => {
 };
 
 /**
- * @pure
- * @param {HTMLElement} trigger
- * @param {Object} config
- * @returns {Object|null}
- */
-const getPaymentForTrigger = (trigger, config) => {
-  const key = trigger.getAttribute('data-payment-key');
-  return key ? SiteConfig.getPaymentOption(config, key) : null;
-};
-
-/**
- * @effect
- * @param {HTMLElement} trigger
- * @returns {void}
- */
-const handlePaymentFallback = (trigger, config) => {
-  const configuredPayment = getPaymentForTrigger(trigger, config);
-  const label = configuredPayment?.label || trigger.getAttribute('data-payment-label') || 'Payment';
-  const payment = SiteConfig.getPayments(config);
-  const message = payment
-    ? `${label} ${payment.fallbackMessage} Please use the Contact page call, text, or email options.`
-    : `${label} checkout link is not configured yet.`;
-
-  window.alert(message);
-};
-
-/**
  * @effect
  * @returns {void}
  */
-const bindGlobalInteractions = (config) => {
+const bindGlobalInteractions = () => {
   document.addEventListener('click', (event) => {
-    const paymentTrigger = event.target.closest('[data-payment-key], [data-payment-placeholder]');
-    if (paymentTrigger) {
-      const configuredPayment = getPaymentForTrigger(paymentTrigger, config);
-
-      if (configuredPayment?.checkoutMode === 'registration' || (configuredPayment?.checkoutUrl && paymentTrigger.getAttribute('href') !== '#')) {
-        return;
-      }
-
-      event.preventDefault();
-      handlePaymentFallback(paymentTrigger, config);
-      return;
-    }
-
     if (event.target.closest('[data-menu-toggle]')) {
       event.preventDefault();
       toggleMobileNavigation();
@@ -310,6 +187,7 @@ const bindGlobalInteractions = (config) => {
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       closeMobileNavigation();
+      closeLegalDialog();
     }
   });
 };
@@ -343,15 +221,13 @@ const initializeApp = () => {
   logDeveloperSignature(config);
   renderHeader(config, getPathFromHash());
   renderFooter(config);
-  bindGlobalInteractions(config);
+  bindGlobalInteractions();
   bindSessionPrivacyGuards();
-  hydratePaymentLinks(config);
   hydrateContactLinks(config);
 
   window.addEventListener('routechange', (event) => {
     renderHeader(config, event.detail.path);
     closeMobileNavigation();
-    hydratePaymentLinks(config);
     hydrateContactLinks(config);
     hydrateRouteViews(config, event.detail.path);
   });

@@ -153,7 +153,7 @@ const deepFreeze = (value) => {
         route: '/register',
         view: 'public/views/register/index.html',
         title: 'Register for the Great Lakes Amateur 2026 | Entry $299',
-        description: 'Register for the 2026 Great Lakes Amateur at Eagle Crest Golf Club. Complete your entry, receive an invoice number, and pay the $299 entry fee through Venmo.'
+        description: 'Register for the Great Lakes Amateur, practice rounds, membership, and sponsorship fees. Select one or more fees on a combined invoice and pay through Venmo.'
       },
       {
         label: 'Contact',
@@ -318,10 +318,6 @@ const deepFreeze = (value) => {
       fallbackEmail: paymentContact.email,
       fallbackMessage: 'online checkout is not configured. Please contact Ryan Yip for payment options.',
       venmoRecipient: 'ryanyipgolf',
-      invoicePrefix: 'GLA',
-      providerNotes: {
-        note: 'Registration uses Venmo payment plus email or SMS invoice delivery to Ryan for payment tracking.'
-      },
       entryFee: {
         key: 'entryFee',
         label: 'Great Lakes Amateur Entry Fee',
@@ -506,9 +502,41 @@ const deepFreeze = (value) => {
     footer: {
       copyright: '© 2026 Michigan Players Golf Club. Great Lakes Amateur.',
       legal: {
-        licenseHref: '/LICENSE',
-        licenseLabel: 'License & legal',
-        architectureCredit: 'FlexNet architecture © Kit Baroness'
+        triggerLabel: 'Terms of use',
+        dialogTitle: 'Website Terms of Use',
+        intro: 'Using this website means you accept these terms. If you do not agree, do not use the site.',
+        closingNote: 'Last updated August 2026. Michigan Players Golf Club may revise these terms at any time. Continued use constitutes acceptance.',
+        sections: [
+          {
+            title: 'Information only',
+            body: 'This site provides Great Lakes Amateur and Michigan Players Golf Club information only. Nothing here is legal, financial, or professional advice. Tournament details may change without notice.'
+          },
+          {
+            title: 'Registration and payments',
+            body: 'Registration happens in your browser. This site does not collect, store, or confirm registration submissions on a server. Venmo payment is between you and the designated payee. Sending email or SMS does not guarantee entry. This site is not a payment processor and does not verify payments.'
+          },
+          {
+            title: 'Your information',
+            body: 'Form data stays on your device until you send email, SMS, or download a PDF. You must provide accurate information and are responsible for all charges, messages, and payment actions taken from your device and accounts.'
+          },
+          {
+            title: 'Site content',
+            body: 'All tournament names, logos, images, schedules, and copy belong to Michigan Players Golf Club or their respective owners. You may not copy, republish, scrape, or reuse site materials without written permission.'
+          },
+          {
+            title: 'Third-party services',
+            body: 'Maps, PDF tools, email, SMS, and payment apps are third-party services with their own terms. Michigan Players Golf Club is not responsible for those services or their availability.'
+          },
+          {
+            title: 'Disclaimer',
+            emphasis: true,
+            body: 'This website and its tools are provided "as is" and "as available," without warranties of any kind. To the fullest extent permitted by law, Michigan Players Golf Club is not liable for errors, schedule changes, failed submissions, payment disputes, lost data, device issues, or any damages arising from your use of this site. You use this site at your own risk.'
+          },
+          {
+            title: 'Contact',
+            body: 'For tournament, registration, or payment questions, use the Contact page.'
+          }
+        ]
       }
     },
     developerSignature: {
@@ -640,20 +668,13 @@ const deepFreeze = (value) => {
   const getRegistrationFeeOption = (config, key) => (
     getRegistrationFeeOptions(config).find((option) => option.key === key) || null
   );
+
   /**
    * @pure
    * @param {Object} config
    * @returns {Object}
    */
   const getSponsorshipShowcase = (config) => config.sponsorshipShowcase;
-
-  /**
-   * @pure
-   * @param {Object} config
-   * @param {String} key
-   * @returns {Object|null}
-   */
-  const getPaymentOption = (config, key) => getRegistrationFeeOption(config, key);
 
   /**
    * @pure
@@ -696,12 +717,10 @@ const SiteConfig = deepFreeze({
     getRegistrationFeeOptions,
   getRegistrationFeeOption,
   getSponsorshipShowcase,
-  buildGoogleMapsSearchLink,
   buildVenmoPaymentUrl,
   buildMailtoLink,
   buildSmsLink,
   getContactAction,
-  getPaymentOption,
   buildRoutes
 });
 

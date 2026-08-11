@@ -15,7 +15,7 @@
 
     <section class="c-registration__panel" data-registration-step-panel="details">
       <p class="c-registration__intro">
-        Fill out your registration details. You will receive an invoice number, pay through Venmo with your registration details in the payment note, then send the invoice by email or text so payment can be matched to your registration.
+        Fill out your registration details. Add one or more fees from the dropdown to combine on a single invoice and Venmo payment, then send the invoice by email or text so payment can be matched to your registration.
       </p>
 
       <p class="c-registration__legal">
@@ -39,11 +39,14 @@
             <input class="c-registration-form__control" type="tel" id="registration-phone" name="phone" autocomplete="tel">
           </div>
 
-          <div class="c-registration-form__group">
-            <label class="c-registration-form__label" for="registration-fee-key">Type of Fee</label>
-            <select class="c-registration-form__control c-registration-form__control--fee" id="registration-fee-key" name="feeKey" required>
-              <option value="">Select payment type</option>
+          <div class="c-registration-form__group c-registration-form__group--full">
+            <label class="c-registration-form__label" for="registration-fee-add">Fees <span class="c-registration-form__optional">(add one or more)</span></label>
+            <select class="c-registration-form__control c-registration-form__control--fee-add" id="registration-fee-add" data-registration-fee-add aria-describedby="registration-fee-selected registration-fee-total">
+              <option value="">Add a fee...</option>
             </select>
+            <ul class="c-registration-form__fee-selected" id="registration-fee-selected" data-registration-fee-selected hidden></ul>
+            <div data-registration-fee-keys-host hidden></div>
+            <p id="registration-fee-total" class="c-registration-form__fee-total" data-registration-fee-total hidden></p>
           </div>
 
           <div class="c-registration-form__group">
@@ -93,7 +96,7 @@
       </div>
 
       <p class="c-registration__note">
-        Venmo will open with the amount and your full registration details prefilled in the payment note. After paying, return here to send the invoice.
+        Venmo will open once with the combined total and your full registration details prefilled in the payment note. After paying, return here to send the invoice.
       </p>
     </section>
 

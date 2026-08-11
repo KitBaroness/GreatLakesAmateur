@@ -1867,9 +1867,109 @@ textarea:focus-visible {
   text-underline-offset: 0.15em;
 }
 
+.c-site-footer__legal-trigger {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
 .c-site-footer__link:hover,
-.c-site-footer__link:focus-visible {
+.c-site-footer__link:focus-visible,
+.c-site-footer__legal-trigger:hover,
+.c-site-footer__legal-trigger:focus-visible {
   color: #fff;
+}
+
+.c-legal-dialog {
+  width: min(92vw, 640px);
+  max-height: min(88vh, 720px);
+  margin: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.c-legal-dialog::backdrop {
+  background: rgba(15, 43, 55, 0.72);
+}
+
+.c-legal-dialog__panel {
+  display: flex;
+  flex-direction: column;
+  max-height: min(88vh, 720px);
+  border-radius: 8px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+}
+
+.c-legal-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-panel);
+}
+
+.c-legal-dialog__title {
+  margin: 0;
+  color: var(--color-lake);
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+}
+
+.c-legal-dialog__close {
+  border: 0;
+  background: none;
+  color: var(--color-muted);
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.c-legal-dialog__body {
+  padding: 20px;
+  overflow: auto;
+}
+
+.c-legal-dialog__intro {
+  margin: 0 0 18px;
+  color: var(--color-ink);
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.c-legal-dialog__section + .c-legal-dialog__section {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--color-border);
+}
+
+.c-legal-dialog__section-title {
+  margin: 0 0 8px;
+  color: var(--color-lake);
+  font-size: 1rem;
+}
+
+.c-legal-dialog__section-body,
+.c-legal-dialog__note {
+  margin: 0;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.c-legal-dialog__section--disclaimer .c-legal-dialog__section-body {
+  color: var(--color-ink);
+  font-size: 0.94rem;
+}
+
+.c-legal-dialog__note {
+  margin-top: 18px;
+  font-size: 0.92rem;
 }
 
 .u-legacy-page {
@@ -2395,11 +2495,6 @@ textarea:focus-visible {
   font: inherit;
 }
 
-.c-registration-form__control--fee {
-  max-width: 100%;
-  text-overflow: ellipsis;
-}
-
 .c-registration-form__control:focus {
   outline: none;
   border-color: var(--color-fairway);
@@ -2409,6 +2504,82 @@ textarea:focus-visible {
 .c-registration-form__control--textarea {
   min-height: 110px;
   resize: vertical;
+}
+
+.c-registration-form__control--fee-add {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-height: 48px;
+  font-size: 16px;
+  line-height: 1.4;
+  appearance: auto;
+  -webkit-appearance: menulist;
+  -moz-appearance: menulist;
+}
+
+.c-registration-form__fee-selected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.c-registration-form__fee-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: rgba(47, 93, 68, 0.08);
+  color: var(--color-ink);
+  font-size: 0.92rem;
+}
+
+.c-registration-form__fee-chip-label {
+  line-height: 1.35;
+}
+
+.c-registration-form__fee-chip-remove {
+  border: 0;
+  background: none;
+  color: var(--color-muted);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.c-registration-form__fee-chip-remove:hover,
+.c-registration-form__fee-chip-remove:focus-visible {
+  color: var(--color-lake);
+}
+
+.c-registration-form__fee-total {
+  margin: 10px 0 0;
+  color: var(--color-lake);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.c-registration-invoice__line-items {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.c-registration-invoice__line-items li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.c-registration-invoice__line-items li:last-child {
+  border-bottom: 0;
 }
 
 .c-registration-form__actions,

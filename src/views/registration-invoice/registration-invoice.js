@@ -68,13 +68,110 @@ const shouldRenderRegistrationForm = (config, routePath) => (
 
 /**
  * @pure
- * @returns {Object}
+ * @param {Number} amountNumeric
+ * @returns {String}
  */
-const getHashQueryParams = () => {
+const formatCurrency = (amountNumeric) => {
+  const normalized = Number(amountNumeric);
+  const hasCents = normalized % 1 !== 0;
+
+  return hasCents
+    ? `$${normalized.toFixed(2)}`
+    : `$${normalized.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+};
+
+/**
+ * @pure
+ * @param {Object} config
+ * @returns {Array}
+ */
+const getHashQueryFeeKeys = (config) => {
   const hash = window.location.hash.replace(/^#/, '');
   const queryIndex = hash.indexOf('?');
   const query = queryIndex >= 0 ? hash.slice(queryIndex + 1) : '';
-  return Object.fromEntries(new URLSearchParams(query));
+  const params = new URLSearchParams(query);
+  const keys = params.getAll('fee')
+    .flatMap((value) => value.split(','))
+    .map((key) => key.trim())
+    .filter(Boolean);
+
+  return [...new Set(keys.filter((key) => SiteConfig.getRegistrationFeeOption(config, key)))];
+};
+
+/**
+ * @pure
+ * @param {Object} config
+ * @param {Array} feeKeys
+ * @returns {Array}
+ */
+const resolveFeeItems = (config, feeKeys) => (
+  feeKeys
+    .map((key) => SiteConfig.getRegistrationFeeOption(config, key))
+    .filter(Boolean)
+    .map((option) => ({
+      key: option.key,
+      label: option.label,
+      shortLabel: option.shortLabel || option.label,
+      amount: option.amount,
+      amountNumeric: option.amountNumeric,
+      category: option.category
+    }))
+);
+
+/**
+ * @pure
+ * @param {Array} feeItems
+ * @returns {Object}
+ */
+const summarizeFeeItems = (feeItems) => {
+  const feeAmountNumeric = feeItems.reduce((total, item) => total + item.amountNumeric, 0);
+
+  return {
+    feeItems,
+    feeKeys: feeItems.map((item) => item.key),
+    feeAmountNumeric,
+    feeAmount: formatCurrency(feeAmountNumeric),
+    feeLabel: feeItems.length === 1
+      ? feeItems[0].label
+      : feeItems.map((item) => item.shortLabel).join(' + '),
+    feeCategory: [...new Set(feeItems.map((item) => item.category))].join(', ')
+  };
+};
+
+/**
+ * @pure
+ * @param {Object} config
+ * @param {Object|null} draft
+ * @returns {Object|null}
+ */
+const normalizeRegistrationDraft = (config, draft) => {
+  if (!draft) return null;
+
+  if (draft.feeItems?.length) {
+    return {
+      ...draft,
+      form: {
+        ...draft.form,
+        feeKeys: draft.feeKeys || draft.feeItems.map((item) => item.key)
+      },
+      ...summarizeFeeItems(draft.feeItems)
+    };
+  }
+
+  const legacyKeys = draft.feeKeys || draft.form?.feeKeys || [];
+  if (legacyKeys.length) {
+    const summary = summarizeFeeItems(resolveFeeItems(config, legacyKeys));
+    return {
+      ...draft,
+      ...summary,
+      form: {
+        ...draft.form,
+        feeKeys: summary.feeKeys
+      }
+    };
+  }
+
+  return draft;
 };
 
 /**
@@ -84,12 +181,27 @@ const getHashQueryParams = () => {
  */
 const parseRegistrationForm = (source) => {
   const read = (key) => String(source.get ? source.get(key) : source[key] || '').trim();
+  const readFeeKeys = () => {
+    if (source.getAll) {
+      return [...new Set(source.getAll('feeKeys').map((key) => String(key).trim()).filter(Boolean))];
+    }
+
+    if (Array.isArray(source.feeKeys)) {
+      return [...new Set(source.feeKeys.map((key) => String(key).trim()).filter(Boolean))];
+    }
+
+    if (source.feeKey) {
+      return [String(source.feeKey).trim()].filter(Boolean);
+    }
+
+    return [];
+  };
 
   return {
     name: read('name'),
     email: read('email'),
     phone: read('phone'),
-    feeKey: read('feeKey'),
+    feeKeys: readFeeKeys(),
     usgaHandicap: read('usgaHandicap'),
     socialHandles: read('socialHandles'),
     scoreStatsLinks: read('scoreStatsLinks'),
@@ -110,7 +222,7 @@ const validateRegistrationForm = (form) => {
 
   if (!form.name) errors.push('Name is required.');
   if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errors.push('A valid email is required.');
-  if (!form.feeKey) errors.push('Select a payment type.');
+  if (!form.feeKeys.length) errors.push('Select at least one fee.');
   if (!form.usgaHandicap) errors.push('USGA handicap index is required.');
   if (!form.location) errors.push('Location is required.');
   if (!form.homeCourse) errors.push('Home course is required.');
@@ -139,9 +251,12 @@ const sanitizeVenmoNotePart = (value) => (
  */
 const buildVenmoNoteParts = (config, draft) => {
   const form = draft.form;
+  const feeSummary = draft.feeItems.length === 1
+    ? draft.feeItems[0].shortLabel
+    : draft.feeItems.map((item) => `${item.shortLabel} ${item.amount}`).join(' + ');
 
   return [
-    `${config.registration.invoicePrefix} ${draft.invoiceNumber} ${draft.feeLabel}`,
+    `${config.registration.invoicePrefix} ${draft.invoiceNumber} ${feeSummary}`,
     `Name: ${sanitizeVenmoNotePart(form.name)}`,
     `Email: ${sanitizeVenmoNotePart(form.email)}`,
     form.phone ? `Phone: ${sanitizeVenmoNotePart(form.phone)}` : '',
@@ -231,9 +346,9 @@ const buildRegistrationInvoiceText = (config, draft) => {
     `Invoice Date: ${formatInvoiceDate(new Date(draft.createdAt))}`,
     '',
     'PAYMENT DETAILS',
-    `Payment Type: ${draft.feeLabel}`,
-    `Category: ${draft.feeCategory}`,
-    `Amount Due: ${draft.feeAmount}`,
+    ...draft.feeItems.flatMap((item) => [`${item.label}: ${item.amount}`]),
+    `Total Due: ${draft.feeAmount}`,
+    `Categories: ${draft.feeCategory}`,
     `Venmo Payee: @${config.payments.venmoRecipient}`,
     `Payer Venmo Handle: @${draft.form.venmoHandle}`,
     '',
@@ -269,7 +384,7 @@ const buildRegistrationInvoiceText = (config, draft) => {
  */
 const buildRegistrationEmailLink = (config, draft) => (
   SiteConfig.buildMailtoLink({
-    subject: `${draft.invoiceNumber} ${draft.feeLabel} - ${draft.form.name}`,
+    subject: `${draft.invoiceNumber} ${draft.feeAmount} - ${draft.form.name}`,
     body: [
       'Hello Ryan,',
       '',
@@ -292,7 +407,7 @@ const buildRegistrationEmailLink = (config, draft) => (
 const buildRegistrationSmsLink = (config, draft) => (
   SiteConfig.buildSmsLink([
     `GLA Invoice ${draft.invoiceNumber}`,
-    `${draft.form.name} paid ${draft.feeAmount} for ${draft.feeLabel}.`,
+    `${draft.form.name} paid ${draft.feeAmount} for ${draft.feeItems.map((item) => item.shortLabel).join(' + ')}.`,
     `Venmo: @${draft.form.venmoHandle}`,
     `Email: ${draft.form.email}`,
     `Handicap: ${draft.form.usgaHandicap}`,
@@ -318,8 +433,12 @@ const createInvoicePreviewMarkup = (config, draft) => `
     <div class="c-registration-invoice__body">
       <section class="c-registration-invoice__section">
         <h3 class="c-registration-invoice__section-title">Payment</h3>
-        <p><strong>${escapeHtml(draft.feeLabel)}</strong></p>
-        <p class="c-registration-invoice__amount">${escapeHtml(draft.feeAmount)}</p>
+        <ul class="c-registration-invoice__line-items">
+          ${draft.feeItems.map((item) => (
+            `<li><span>${escapeHtml(item.label)}</span><strong>${escapeHtml(item.amount)}</strong></li>`
+          )).join('')}
+        </ul>
+        <p class="c-registration-invoice__amount">Total: ${escapeHtml(draft.feeAmount)}</p>
         <p>Venmo payee: <strong>@${escapeHtml(config.payments.venmoRecipient)}</strong></p>
         <p class="c-registration-invoice__venmo-note">Venmo note to include: <strong>${escapeHtml(buildVenmoNote(config, draft))}</strong></p>
       </section>
@@ -354,10 +473,10 @@ const formatFeeOptionSelectLabel = (option) => (
 /**
  * @pure
  * @param {Array} feeOptions
- * @param {String} selectedKey
+ * @param {Array} selectedKeys
  * @returns {String}
  */
-const createFeeOptionsMarkup = (feeOptions, selectedKey = '') => {
+const createFeeAddSelectMarkup = (feeOptions, selectedKeys = []) => {
   const groups = new Map();
 
   feeOptions.forEach((option) => {
@@ -371,11 +490,78 @@ const createFeeOptionsMarkup = (feeOptions, selectedKey = '') => {
   });
 
   return [...groups.entries()].map(([category, options]) => (
-    `<optgroup label="${escapeHtml(category)}">${options.map((option) => (
-      `<option value="${escapeHtml(option.key)}"${option.key === selectedKey ? ' selected' : ''} title="${escapeHtml(option.label)}">${escapeHtml(formatFeeOptionSelectLabel(option))}</option>`
-    )).join('')}</optgroup>`
+    `<optgroup label="${escapeHtml(category)}">${options.map((option) => {
+      const isSelected = selectedKeys.includes(option.key);
+      return `<option value="${escapeHtml(option.key)}"${isSelected ? ' disabled' : ''} title="${escapeHtml(option.label)}">${escapeHtml(formatFeeOptionSelectLabel(option))}${isSelected ? ' (added)' : ''}</option>`;
+    }).join('')}</optgroup>`
   )).join('');
 };
+
+/**
+ * @effect
+ * @param {Object} config
+ * @param {HTMLElement} root
+ * @param {Array} feeKeys
+ * @returns {void}
+ */
+const syncFeeSelection = (config, root, feeKeys) => {
+  const form = root.querySelector(REGISTRATION_FORM_SELECTOR);
+  const feeAddSelect = root.querySelector('[data-registration-fee-add]');
+  const selectedHost = root.querySelector('[data-registration-fee-selected]');
+  const keysHost = root.querySelector('[data-registration-fee-keys-host]');
+  const totalHost = root.querySelector('[data-registration-fee-total]');
+  const feeItems = resolveFeeItems(config, feeKeys);
+  const allOptions = SiteConfig.getRegistrationFeeOptions(config);
+
+  if (feeAddSelect instanceof HTMLSelectElement) {
+    feeAddSelect.innerHTML = `<option value="">Add a fee...</option>${createFeeAddSelectMarkup(allOptions, feeKeys)}`;
+  }
+
+  if (keysHost) {
+    keysHost.innerHTML = feeKeys.map((key) => (
+      `<input type="hidden" name="feeKeys" value="${escapeHtml(key)}">`
+    )).join('');
+  }
+
+  if (selectedHost) {
+    if (!feeItems.length) {
+      selectedHost.hidden = true;
+      selectedHost.innerHTML = '';
+    } else {
+      selectedHost.hidden = false;
+      selectedHost.innerHTML = feeItems.map((item) => (
+        `<li class="c-registration-form__fee-chip">
+          <span class="c-registration-form__fee-chip-label" title="${escapeHtml(item.label)}">${escapeHtml(formatFeeOptionSelectLabel(item))}</span>
+          <button type="button" class="c-registration-form__fee-chip-remove" data-registration-fee-remove="${escapeHtml(item.key)}" aria-label="Remove ${escapeHtml(item.shortLabel)}">&times;</button>
+        </li>`
+      )).join('');
+    }
+  }
+
+  if (totalHost) {
+    if (!feeItems.length) {
+      totalHost.hidden = true;
+      totalHost.textContent = '';
+      return;
+    }
+
+    totalHost.hidden = false;
+    totalHost.textContent = `Combined total: ${summarizeFeeItems(feeItems).feeAmount}`;
+  }
+
+  if (form) {
+    form.dataset.selectedFeeCount = String(feeKeys.length);
+  }
+};
+
+/**
+ * @pure
+ * @param {HTMLFormElement} form
+ * @returns {Array}
+ */
+const getSelectedFeeKeysFromForm = (form) => (
+  [...new Set([...form.querySelectorAll('input[name="feeKeys"]')].map((input) => input.value).filter(Boolean))]
+);
 
 /**
  * @effect
@@ -385,7 +571,7 @@ const createFeeOptionsMarkup = (feeOptions, selectedKey = '') => {
 const loadRegistrationDraft = (config) => {
   try {
     const raw = sessionStorage.getItem(config.registration.storageKey);
-    return raw ? JSON.parse(raw) : null;
+    return raw ? normalizeRegistrationDraft(config, JSON.parse(raw)) : null;
   } catch {
     return null;
   }
@@ -469,7 +655,11 @@ const renderRegistrationErrors = (root, errors) => {
 const populateRegistrationForm = (form, draft) => {
   if (!form || !draft?.form) return;
 
+  const feeKeys = draft.feeKeys || draft.form?.feeKeys || [];
+
   Object.entries(draft.form).forEach(([key, value]) => {
+    if (key === 'feeKeys') return;
+
     const field = form.elements.namedItem(key);
     if (!field) return;
 
@@ -479,6 +669,10 @@ const populateRegistrationForm = (form, draft) => {
     }
 
     field.value = value;
+  });
+
+  form.querySelectorAll('input[name="feeKeys"]').forEach((input) => {
+    input.remove();
   });
 };
 
@@ -490,10 +684,10 @@ const populateRegistrationForm = (form, draft) => {
  */
 const createDraftFromForm = (config, form) => {
   const formValues = parseRegistrationForm(new FormData(form));
-  const feeOption = SiteConfig.getRegistrationFeeOption(config, formValues.feeKey);
+  const feeItems = resolveFeeItems(config, formValues.feeKeys);
 
-  if (!feeOption) {
-    throw new Error('Select a valid payment type.');
+  if (!feeItems.length) {
+    throw new Error('Select at least one fee.');
   }
 
   return {
@@ -502,12 +696,8 @@ const createDraftFromForm = (config, form) => {
     createdAt: new Date().toISOString(),
     venmoOpenedAt: null,
     sentAt: null,
-    feeKey: feeOption.key,
-    feeLabel: feeOption.label,
-    feeAmount: feeOption.amount,
-    feeAmountNumeric: feeOption.amountNumeric,
-    feeCategory: feeOption.category,
-    form: formValues
+    form: formValues,
+    ...summarizeFeeItems(feeItems)
   };
 };
 
@@ -545,7 +735,7 @@ const renderSendStep = (config, root, draft) => {
   const invoiceText = buildRegistrationInvoiceText(config, draft);
 
   if (summary) {
-    summary.textContent = `Invoice ${draft.invoiceNumber} for ${draft.feeAmount} (${draft.feeLabel}). Your Venmo payment note includes your registration details. Send the invoice by email or text when payment is complete.`;
+    summary.textContent = `Invoice ${draft.invoiceNumber} for ${draft.feeAmount} (${draft.feeLabel}). One Venmo payment covers all selected fees. Send the invoice by email or text when payment is complete.`;
   }
 
   if (emailLink) {
@@ -604,35 +794,37 @@ const downloadRegistrationInvoicePdf = async (config, draft) => {
  */
 const hydrateRegistrationView = (config, root, draft) => {
   const form = root.querySelector(REGISTRATION_FORM_SELECTOR);
-  const feeSelect = form?.elements.namedItem('feeKey');
-  const queryFee = getHashQueryParams().fee;
-  const requestedFee = queryFee && SiteConfig.getRegistrationFeeOption(config, queryFee)
-    ? queryFee
-    : '';
-  // A fee chosen from a tier link outranks the stored draft so sponsorship
-  // selections are not silently replaced by an earlier in-progress fee.
-  const feeChanged = Boolean(requestedFee && draft && draft.feeKey !== requestedFee);
+  const normalizedDraft = normalizeRegistrationDraft(config, draft);
+  const requestedFeeKeys = getHashQueryFeeKeys(config);
+  const draftFeeKeys = normalizedDraft?.feeKeys || normalizedDraft?.form?.feeKeys || [];
+  const selectedFeeKeys = requestedFeeKeys.length ? requestedFeeKeys : draftFeeKeys;
+  const feeSelectionChanged = Boolean(
+    requestedFeeKeys.length
+    && normalizedDraft
+    && (
+      requestedFeeKeys.length !== draftFeeKeys.length
+      || requestedFeeKeys.some((key) => !draftFeeKeys.includes(key))
+    )
+  );
 
-  if (feeSelect instanceof HTMLSelectElement) {
-    const selectedKey = requestedFee || draft?.feeKey || feeSelect.value;
-    feeSelect.innerHTML = `<option value="">Select payment type</option>${createFeeOptionsMarkup(
-      SiteConfig.getRegistrationFeeOptions(config),
-      selectedKey
-    )}`;
-  }
+  syncFeeSelection(config, root, selectedFeeKeys);
 
-  if (draft) {
+  if (normalizedDraft) {
     if (form) {
-      populateRegistrationForm(form, draft);
-
-      if (feeChanged && feeSelect instanceof HTMLSelectElement) {
-        feeSelect.value = requestedFee;
-      }
+      populateRegistrationForm(form, {
+        ...normalizedDraft,
+        feeKeys: selectedFeeKeys,
+        form: {
+          ...normalizedDraft.form,
+          feeKeys: selectedFeeKeys
+        }
+      });
+      syncFeeSelection(config, root, selectedFeeKeys);
     }
 
-    renderInvoiceStep(config, root, draft);
-    renderSendStep(config, root, draft);
-    showRegistrationStep(root, feeChanged ? 'details' : draft.step);
+    renderInvoiceStep(config, root, normalizedDraft);
+    renderSendStep(config, root, normalizedDraft);
+    showRegistrationStep(root, feeSelectionChanged ? 'details' : normalizedDraft.step);
     return;
   }
 
@@ -709,12 +901,39 @@ const bindRegistrationInteractions = (config, root) => {
       event.preventDefault();
       clearRegistrationDraft(config);
       form.reset();
+      syncFeeSelection(config, root, []);
       showRegistrationStep(root, 'complete');
       return;
+    }
+
+    const feeRemove = event.target.closest('[data-registration-fee-remove]');
+    if (feeRemove) {
+      event.preventDefault();
+      const key = feeRemove.getAttribute('data-registration-fee-remove');
+      syncFeeSelection(
+        config,
+        root,
+        getSelectedFeeKeysFromForm(form).filter((feeKey) => feeKey !== key)
+      );
     }
   };
 
   runtime.changeHandler = (event) => {
+    const currentForm = root.querySelector(REGISTRATION_FORM_SELECTOR);
+
+    if (event.target.matches('[data-registration-fee-add]') && currentForm) {
+      const feeKey = event.target.value;
+      if (!feeKey) return;
+
+      const selectedKeys = getSelectedFeeKeysFromForm(currentForm);
+      if (!selectedKeys.includes(feeKey)) {
+        syncFeeSelection(config, root, [...selectedKeys, feeKey]);
+      }
+
+      event.target.value = '';
+      return;
+    }
+
     if (event.target.name === 'paymentConfirmed') {
       const draft = loadRegistrationDraft(config);
       if (!draft) return;

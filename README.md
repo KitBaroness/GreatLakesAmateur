@@ -20,9 +20,10 @@ Third-party attributions are listed in [NOTICE](NOTICE).
 
 - **FlexNet Architecture Code** (router, loader, config patterns, utilities, BEM structure, scripts) may be used as a template or example, including for commercial sites, with attribution.
 - **Site Content and Assets** (Michigan Players Golf Club / Great Lakes Amateur branding, copy, images, tournament data, sponsor marks, and view text) may not be reused publicly without permission from Michigan Players Golf Club (Principal: Ryan Yip).
-- The live site footer links to `/LICENSE` and credits FlexNet architecture separately from club copyright.
+- **Website visitors** see **Terms of use** in the site footer — a public-facing terms dialog, separate from the repository `LICENSE`.
+- **Developers** use the repository `LICENSE` and `NOTICE` files for code/template rights and third-party attributions.
 
-See [LICENSE](LICENSE) and [NOTICE](NOTICE) for full terms, third-party notices, termination, and governing law.
+See [LICENSE](LICENSE) and [NOTICE](NOTICE) for developer and repository terms, third-party notices, termination, and governing law.
 
 > This is not legal advice. For contractual client work, keep written permission from Michigan Players Golf Club for portfolio and repository publication.
 
@@ -140,7 +141,7 @@ Modern formats are served with JPEG fallbacks through `<picture>`:
 | Home hero | AVIF, WebP, JPEG | `430w` and `860w` srcset; ~19 KiB AVIF at display size |
 | Home sidebar | WebP, JPEG | Lazy-loaded; hidden on small screens |
 | Header logo | WebP, JPEG | 200px WebP variant for the fixed header |
-| Upcoming events hero | WebP, JPEG | Featured tournament card |
+| Upcoming events hero | WebP | Featured tournament card (`upcoming-gla.webp`) |
 
 Bump `config.version` in `src/core/site-config.js` when **view fragments** change. Also update `css/styles.css?v=` and `loader.js?v=` in `index.html` when static assets must invalidate immediately. `_headers` gives `/assets/*` a 7-day immutable cache, `/css/*` and `/src/*` a 24-hour cache, and HTML shells `no-store`.
 
@@ -179,6 +180,7 @@ Browser-controlled HTTP cache, mail client drafts, SMS drafts, autofill systems,
 - `src/core/loader.js`: ES module bootstrap and browser side effects.
 - `src/core/layout/renderHeader.js`: Pure header rendering with escaped config output.
 - `src/core/layout/renderFooter.js`: Pure footer rendering with escaped config output.
+- `src/core/layout/renderLegalDialog.js`: Footer legal dialog markup and open/close interactions.
 - `src/utilities/router.js`: Browser-native hash router, view loader, prefetch, and per-route SEO metadata updates.
 - `src/utilities/routeViewModules.js`: Lazy dynamic imports for route-specific view modules.
 - `src/utilities/escapeHtml.js`: Shared HTML escaping helper for markup builders.
@@ -205,7 +207,7 @@ The visual theme is tuned for a professional amateur golf event in Great Lakes M
 |------|------|-------------|
 | `#/home` | `public/views/home/index.html` | Home page with tournament hero, dates, and highlighted entry fee |
 | `#/event-details` | `public/views/event-details/index.html` | Tournament details, schedule, prizes, course info, entry fee, and scoring link |
-| `#/register` | `public/views/register/index.html` | Multi-step registration, invoice, Venmo payment, and email/SMS invoice send |
+| `#/register` | `public/views/register/index.html` | Multi-step registration with multi-fee dropdown, combined invoice, one Venmo payment, and email/SMS send |
 | `#/contact` | `public/views/contact/index.html` | Call/text/email actions and Leaflet map for Eagle Crest plus nearby hotels |
 | `#/upcoming-events` | `public/views/upcoming-events/index.html` | Upcoming events listing |
 | `#/sponsorship` | `public/views/sponsorship/index.html` | Sponsorship tiers, partner carousel, testimonials, and register links |
@@ -234,8 +236,9 @@ Note: Content Security Policy headers in `_headers` apply on Cloudflare Pages. U
 
 Payment and contact behavior is centralized in `src/core/site-config.js`.
 
-- Entry fee and sponsorship tiers route to `#/register` with the selected fee type.
-- Registration creates an invoice number, opens Venmo with the invoice note, and lets the visitor send the invoice by email or SMS.
+- Entry fee, practice round, membership, and sponsorship tiers route to `#/register` with optional `?fee=` deep links (repeat the parameter for multiple preselected fees).
+- Registration supports **one or more fees on a single invoice** with a combined Venmo total.
+- Registration creates an invoice number, opens Venmo once with the combined amount and registration note, and lets the visitor send the invoice by email or SMS.
 - Legacy Wix checkout is not embedded in this site.
 - Call/text/email: mobile-friendly `tel:`, `sms:`, and prefilled `mailto:` links are generated from config.
 
@@ -247,17 +250,18 @@ The `#/register` route is a **client-side, manual reconciliation** workflow. A u
 
 ```mermaid
 flowchart TD
-    A[Visitor completes registration form] --> B[Unique invoice number generated<br/>GLA-YYYYMMDD-XXXX]
-    B --> C[Invoice preview and optional PDF download]
-    B --> D[Pay through Venmo]
-    D --> E[Venmo opens with payee, amount,<br/>and invoice note prefilled]
-    E --> F[Visitor completes Venmo payment]
-    B --> G[Visitor sends invoice by email or SMS]
-    G --> H[Payee receives invoice number,<br/>registrant details, and payer Venmo handle]
-    F --> I[Payee manually matches<br/>Venmo transaction to invoice]
-    H --> I
-    I --> J[Payment reconciled to registration]
-    K[Visitor clicks Finish Registration] --> L[Browser sessionStorage cleared<br/>No server notification]
+    A[Visitor completes registration form] --> B[Add one or more fees from dropdown]
+    B --> C[Unique invoice number generated<br/>GLA-YYYYMMDD-XXXX]
+    C --> D[Invoice preview and optional PDF download]
+    C --> E[Pay through Venmo once]
+    E --> F[Venmo opens with combined total,<br/>payee, and registration note prefilled]
+    F --> G[Visitor completes Venmo payment]
+    C --> H[Visitor sends invoice by email or SMS]
+    H --> I[Payee receives invoice number,<br/>line items, registrant details, and payer Venmo handle]
+    G --> J[Payee manually matches<br/>Venmo transaction to invoice]
+    I --> J
+    J --> K[Payment reconciled to registration]
+    L[Visitor clicks Finish Registration] --> M[Browser sessionStorage cleared<br/>No server notification]
 ```
 
 Traceability depends on shared registration details in the Venmo note and invoice:
@@ -267,7 +271,7 @@ Traceability depends on shared registration details in the Venmo note and invoic
 | Invoice number | Venmo payment note, invoice preview/PDF, email subject, SMS body |
 | Registrant details | Venmo payment note (name, email, phone, location, course, handicap, optional profile) |
 | Payer Venmo handle | Registration form (required), Venmo note, invoice text, SMS summary |
-| Fee amount and type | Venmo amount prefill, invoice line items |
+| Fee line items and combined total | Venmo amount prefill, invoice preview/PDF, email body, SMS summary |
 
 ### What this flow does not do
 
@@ -289,7 +293,7 @@ For guaranteed submission records or payment confirmation, add a secure backend 
 - **Sitemap and robots**: Edit `sitemap.xml` and `robots.txt` at the repo root.
 - **Legacy redirects**: Edit `_redirects` and the matching top-level `.html` shells.
 - **Page content**: Edit the matching file under `public/views/`.
-- **Shared layout**: Edit `src/core/layout/renderHeader.js` or `src/core/layout/renderFooter.js`.
+- **Shared layout**: Edit `src/core/layout/renderHeader.js`, `src/core/layout/renderFooter.js`, or public website terms in `footer.legal` inside `src/core/site-config.js`.
 - **Styles**: Edit BEM components in `css/styles.css`.
 - **Payments and registration fees**: Edit the `payments` and `registration` objects in `src/core/site-config.js`.
 - **Contact actions**: Edit the `contact` object in `src/core/site-config.js`.
