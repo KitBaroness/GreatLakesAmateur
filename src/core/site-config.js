@@ -528,10 +528,6 @@ const deepFreeze = (value) => {
             href: 'https://www.pgatour.com/player/30261/ryan-yip'
           },
           {
-            label: 'PGA TOUR Americas — Career',
-            href: 'https://www.pgatour.com/americas/player/30261/ryan-yip/career'
-          },
-          {
             label: 'ESPN — Tournament Results',
             href: 'https://www.espn.com/golf/player/scorecards/_/id/3372/ryan-yip'
           }
