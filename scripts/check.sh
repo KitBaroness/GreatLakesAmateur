@@ -162,14 +162,32 @@ if 'shortLabel:' not in config:
 
 footer = pathlib.Path('src/core/layout/renderFooter.js').read_text()
 if 'data-legal-dialog-open' not in footer:
-    sys.exit('footer missing terms of use dialog trigger')
+    sys.exit('footer missing legal dialog triggers')
 
-if 'Website Terms of Use' not in config:
-    sys.exit('site config missing public website terms of use')
+required_legal_ids = ['terms', 'privacy', 'accessibility', 'do-not-sell']
+for legal_id in required_legal_ids:
+    if f"id: '{legal_id}'" not in config:
+        sys.exit(f'site config missing legal document: {legal_id}')
+
+if "id: 'about-ryan-yip'" not in config:
+    sys.exit('site config missing footer about section for Ryan Yip')
+
+legal_markers = ['WCAG 2.1', 'CCPA', 'State of Michigan']
+for marker in legal_markers:
+    if marker not in config:
+        sys.exit(f'site config missing legal compliance marker: {marker}')
+
+headers = pathlib.Path('_headers').read_text()
+for header in ['Strict-Transport-Security', 'Content-Security-Policy', 'X-Frame-Options']:
+    if header not in headers:
+        sys.exit(f'_headers missing {header}')
 
 register_view = pathlib.Path('public/views/register/index.html').read_text()
 if 'data-registration-fee-add' not in register_view:
     sys.exit('register view missing fee add dropdown')
+
+if 'data-legal-dialog-open="privacy"' not in register_view:
+    sys.exit('register view missing privacy policy consent link')
 
 invoice = pathlib.Path('src/views/registration-invoice/registration-invoice.js').read_text()
 if 'syncFeeSelection' not in invoice:
@@ -180,6 +198,30 @@ then
   pass=$((pass + 1))
 else
   echo "  FAIL registration fee options and mobile helper"
+  fail=$((fail + 1))
+fi
+
+echo
+echo "Cache version sync"
+if python3 - <<'PY'
+import pathlib, re, sys
+
+config = pathlib.Path('src/core/site-config.js').read_text()
+index = pathlib.Path('index.html').read_text()
+
+match = re.search(r"version:\s*'([^']+)'", config)
+if not match:
+    sys.exit('site-config missing version field')
+
+version = match.group(1)
+if f'?v={version}' not in index:
+    sys.exit(f'index.html cache bust out of sync with config version {version}')
+PY
+then
+  echo "  OK  index.html version matches site-config"
+  pass=$((pass + 1))
+else
+  echo "  FAIL cache version drift"
   fail=$((fail + 1))
 fi
 

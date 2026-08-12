@@ -592,6 +592,17 @@ textarea:focus-visible {
   text-transform: uppercase;
 }
 
+.c-event-meta__fee-link {
+  display: inline-block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.c-event-meta__fee-link:hover .c-event-meta__fee-badge {
+  background: var(--color-gold);
+  color: var(--color-lake-strong);
+}
+
 .c-event-meta__fee-detail {
   max-width: 560px;
 }
@@ -1859,6 +1870,12 @@ textarea:focus-visible {
   margin: 10px 0 0;
   color: rgba(255, 255, 255, 0.62);
   font-size: 12px;
+  line-height: 1.6;
+}
+
+.c-site-footer__separator {
+  color: rgba(255, 255, 255, 0.45);
+  white-space: nowrap;
 }
 
 .c-site-footer__link {
@@ -1970,6 +1987,28 @@ textarea:focus-visible {
 .c-legal-dialog__note {
   margin-top: 18px;
   font-size: 0.92rem;
+}
+
+.c-legal-dialog__links {
+  margin: 0;
+  padding-left: 1.2em;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.c-legal-dialog__links li + li {
+  margin-top: 0.45em;
+}
+
+.c-legal-dialog__link {
+  color: var(--color-lake);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.c-legal-dialog__link:hover,
+.c-legal-dialog__link:focus-visible {
+  color: var(--color-lake-strong);
 }
 
 .u-legacy-page {
@@ -2428,6 +2467,17 @@ textarea:focus-visible {
 .c-registration__legal {
   font-size: 0.92rem;
   line-height: 1.55;
+}
+
+.c-registration__legal .c-site-footer__legal-trigger {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.c-registration__legal .c-site-footer__legal-trigger:hover,
+.c-registration__legal .c-site-footer__legal-trigger:focus-visible {
+  color: var(--color-link-hover, var(--color-link));
 }
 
 .c-registration__errors-host:not([hidden]) {

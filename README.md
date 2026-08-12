@@ -20,7 +20,7 @@ Third-party attributions are listed in [NOTICE](NOTICE).
 
 - **FlexNet Architecture Code** (router, loader, config patterns, utilities, BEM structure, scripts) may be used as a template or example, including for commercial sites, with attribution.
 - **Site Content and Assets** (Michigan Players Golf Club / Great Lakes Amateur branding, copy, images, tournament data, sponsor marks, and view text) may not be reused publicly without permission from Michigan Players Golf Club (Principal: Ryan Yip).
-- **Website visitors** see **Terms of use** in the site footer — a public-facing terms dialog, separate from the repository `LICENSE`.
+- **Website visitors** see **Terms of Service**, **Privacy Policy**, **Accessibility**, and **Do Not Sell or Share My Personal Information** in the site footer — each opens a concise public-facing policy dialog aligned with common U.S. privacy and accessibility expectations and this site’s client-side data practices. These are separate from the repository `LICENSE`.
 - **Developers** use the repository `LICENSE` and `NOTICE` files for code/template rights and third-party attributions.
 
 See [LICENSE](LICENSE) and [NOTICE](NOTICE) for developer and repository terms, third-party notices, termination, and governing law.
@@ -157,7 +157,7 @@ Security boundaries still matter:
 - The contact page provides call, text, email, and map actions. It does not include a server-side contact form.
 - The contact map loads Leaflet JavaScript and CSS from `unpkg.com` or `cdn.jsdelivr.net`, and map tiles from OpenStreetMap, so visitors' browsers make third-party map requests when the contact route is viewed.
 - CDN scripts and stylesheets loaded by the runtime use Subresource Integrity hashes defined in `src/core/site-config.js`.
-- `_headers` applies a Content Security Policy, `nosniff`, referrer policy, permissions policy, and cache rules for Cloudflare Pages.
+- `_headers` applies HTTPS enforcement (HSTS), Content Security Policy with `upgrade-insecure-requests`, `X-Frame-Options`, `nosniff`, strict referrer policy, permissions policy (camera, microphone, geolocation, payment, USB, and interest-cohort disabled), cross-origin opener/resource policies, and cache rules for Cloudflare Pages.
 - Any future automatic email delivery or hosted checkout should use a secure backend endpoint such as a Cloudflare Pages Function with environment variables.
 - Any server-side endpoint should validate inputs, rate limit submissions, avoid exposing secrets, and return only the minimum response data needed by the browser.
 
@@ -293,7 +293,7 @@ For guaranteed submission records or payment confirmation, add a secure backend 
 - **Sitemap and robots**: Edit `sitemap.xml` and `robots.txt` at the repo root.
 - **Legacy redirects**: Edit `_redirects` and the matching top-level `.html` shells.
 - **Page content**: Edit the matching file under `public/views/`.
-- **Shared layout**: Edit `src/core/layout/renderHeader.js`, `src/core/layout/renderFooter.js`, or public website terms in `footer.legal` inside `src/core/site-config.js`.
+- **Shared layout**: Edit `src/core/layout/renderHeader.js`, `src/core/layout/renderFooter.js`, or public website policies in `footer.legal.documents` inside `src/core/site-config.js` (Terms, Privacy, Accessibility, Do Not Sell/Share).
 - **Styles**: Edit BEM components in `css/styles.css`.
 - **Payments and registration fees**: Edit the `payments` and `registration` objects in `src/core/site-config.js`.
 - **Contact actions**: Edit the `contact` object in `src/core/site-config.js`.

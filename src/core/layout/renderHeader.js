@@ -8,16 +8,16 @@ import SiteConfig from '../site-config.js';
 
 const toHash = (route) => `#${route}`;
 
-const navLinkClass = (route, currentPath) => (
-  route === currentPath
-    ? 'c-site-header__link c-site-header__link--active'
-    : 'c-site-header__link'
-);
-
-const mobileNavLinkClass = (route, currentPath) => (
-  route === currentPath
-    ? 'c-mobile-nav__link c-mobile-nav__link--active'
-    : 'c-mobile-nav__link'
+/**
+ * @pure
+ * @param {String} baseClass
+ * @param {String} activeClass
+ * @param {String} route
+ * @param {String} currentPath
+ * @returns {String}
+ */
+const linkClass = (baseClass, activeClass, route, currentPath) => (
+  route === currentPath ? `${baseClass} ${activeClass}` : baseClass
 );
 
 const ariaCurrent = (route, currentPath) => (
@@ -32,18 +32,31 @@ const ctaClass = (variant) => (
 
 /**
  * @pure
+ * @param {String} currentPath
+ * @param {Object} config
+ * @returns {String}
+ */
+const resolveCurrentPath = (currentPath, config) => (
+  !currentPath || currentPath === '/'
+    ? SiteConfig.getDefaultRoute(config)
+    : currentPath
+);
+
+/**
+ * @pure
  * @param {Object} config
  * @param {String} currentPath
  * @returns {String}
  */
 const createHeaderMarkup = (config, currentPath) => {
+  const activePath = resolveCurrentPath(currentPath, config);
   const brand = SiteConfig.getBrand(config);
   const navItems = SiteConfig.getNavigation(config)
     .filter((item) => item.route !== brand.homeRoute);
   const actions = SiteConfig.getCallsToAction(config);
 
   const navMarkup = navItems.map((item) => `
-        <a class="${navLinkClass(item.route, currentPath)}" href="${toHash(item.route)}"${ariaCurrent(item.route, currentPath)}>${escapeHtml(item.label)}</a>
+        <a class="${linkClass('c-site-header__link', 'c-site-header__link--active', item.route, activePath)}" href="${toHash(item.route)}"${ariaCurrent(item.route, activePath)}>${escapeHtml(item.label)}</a>
       `.trim()).join('');
 
   const actionMarkup = actions.map((action) => `
@@ -75,7 +88,7 @@ const createHeaderMarkup = (config, currentPath) => {
     </div>
 
     <nav class="c-mobile-nav" aria-label="Mobile navigation" data-mobile-nav hidden>
-      ${navItems.map((item) => `<a class="${mobileNavLinkClass(item.route, currentPath)}" href="${toHash(item.route)}"${ariaCurrent(item.route, currentPath)}>${escapeHtml(item.label)}</a>`).join('')}
+      ${navItems.map((item) => `<a class="${linkClass('c-mobile-nav__link', 'c-mobile-nav__link--active', item.route, activePath)}" href="${toHash(item.route)}"${ariaCurrent(item.route, activePath)}>${escapeHtml(item.label)}</a>`).join('')}
     </nav>
   `.trim();
 };

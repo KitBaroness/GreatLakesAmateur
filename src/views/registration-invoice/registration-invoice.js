@@ -718,6 +718,7 @@ const renderInvoiceStep = (config, root, draft) => {
 
   if (venmoLink) {
     venmoLink.setAttribute('href', buildVenmoPaymentUrl(config, draft));
+    venmoLink.setAttribute('rel', 'noopener noreferrer');
   }
 };
 
@@ -740,10 +741,12 @@ const renderSendStep = (config, root, draft) => {
 
   if (emailLink) {
     emailLink.setAttribute('href', buildRegistrationEmailLink(config, draft));
+    emailLink.setAttribute('rel', 'noopener noreferrer');
   }
 
   if (smsLink) {
     smsLink.setAttribute('href', buildRegistrationSmsLink(config, draft));
+    smsLink.setAttribute('rel', 'noopener noreferrer');
   }
 
   root.dataset.invoiceText = invoiceText;

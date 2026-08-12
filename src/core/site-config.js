@@ -22,6 +22,8 @@ const deepFreeze = (value) => {
     email: 'yipper.rmy@gmail.com'
   };
 
+  const publicContactEmail = 'hello@michiganplayersgolfclub.com';
+
   /**
    * @pure
    * @param {Object} params
@@ -39,7 +41,7 @@ const deepFreeze = (value) => {
   const buildSmsLink = (body) => `sms:${paymentContact.phoneE164}?body=${encodeURIComponent(body)}`;
 
   /**
-   * @pure
+   * Builds a Venmo web or app URL. Reads navigator.userAgent when available.
    * @param {Object} params
    * @returns {String}
    */
@@ -501,40 +503,191 @@ const deepFreeze = (value) => {
     },
     footer: {
       copyright: '© 2026 Michigan Players Golf Club. Great Lakes Amateur.',
-      legal: {
-        triggerLabel: 'Terms of use',
-        dialogTitle: 'Website Terms of Use',
-        intro: 'By using this website you accept these terms.',
-        closingNote: 'Last updated August 2026. Michigan Players Golf Club may revise these terms at any time. Continued use constitutes acceptance.',
+      about: {
+        id: 'about-ryan-yip',
+        label: 'Tournament Director',
+        dialogTitle: 'Ryan Yip — Tournament Director',
+        intro: 'Ryan Yip directs the Great Lakes Amateur for Michigan Players Golf Club.',
         sections: [
           {
-            title: 'Information only',
-            body: 'This site provides Great Lakes Amateur and Michigan Players Golf Club information only. Nothing here is legal, financial, or professional advice. Tournament details may change without notice.'
+            title: 'Background',
+            body: 'Originally from Calgary, Alberta, Ryan played collegiately at Kent State University and turned professional in 2007. He has competed on the Korn Ferry Tour and PGA TOUR Americas.'
           },
           {
-            title: 'Registration and payments',
-            body: 'Registration happens in your browser. This site does not collect, store, or confirm registration submissions on a server. Venmo payment is between you and the designated payee. Sending email or SMS does not guarantee entry. This site is not a payment processor and does not verify payments.'
+            title: 'Coaching',
+            body: 'Ryan is head men\'s golf coach at Eastern Michigan University.'
+          }
+        ],
+        links: [
+          {
+            label: 'Eastern Michigan University — Coaching Staff',
+            href: 'https://emueagles.com/sports/mens-golf/roster/coaches/ryan-yip/2268'
           },
           {
-            title: 'Your information',
-            body: 'Form data stays on your device until you send email, SMS, or download a PDF. You must provide accurate information and are responsible for all charges, messages, and payment actions taken from your device and accounts.'
+            label: 'PGA TOUR — Player Profile',
+            href: 'https://www.pgatour.com/player/30261/ryan-yip'
           },
           {
-            title: 'Site content',
-            body: 'All tournament names, logos, images, schedules, and copy belong to Michigan Players Golf Club or their respective owners. You may not copy, republish, scrape, or reuse site materials without written permission.'
+            label: 'PGA TOUR Americas — Career',
+            href: 'https://www.pgatour.com/americas/player/30261/ryan-yip/career'
           },
           {
-            title: 'Third-party services',
-            body: 'Maps, PDF tools, email, SMS, and payment apps are third-party services with their own terms. Michigan Players Golf Club is not responsible for those services or their availability.'
+            label: 'ESPN — Tournament Results',
+            href: 'https://www.espn.com/golf/player/scorecards/_/id/3372/ryan-yip'
+          }
+        ],
+        closingNote: 'Linked profiles are published and maintained by their respective organizations.'
+      },
+      legal: {
+        entity: {
+          name: 'Michigan Players Golf Club',
+          principal: 'Ryan Yip',
+          jurisdiction: 'State of Michigan, United States',
+          website: 'https://www.michiganplayersgolfclub.com',
+          privacyEmail: publicContactEmail,
+          lastUpdated: 'August 2026'
+        },
+        documents: [
+          {
+            id: 'terms',
+            label: 'Terms of Service',
+            dialogTitle: 'Terms of Service',
+            intro: 'These Terms of Service ("Terms") apply to michiganplayersgolfclub.com. By using this site, you agree to these Terms and our Privacy Policy.',
+            closingNote: 'Last updated August 2026. We may update these Terms by posting a revised version on this site.',
+            sections: [
+              {
+                title: 'Use of this site',
+                body: 'This website provides tournament and club information for the Great Lakes Amateur and Michigan Players Golf Club. Content is for general information only and is not legal, financial, or professional advice. Event details, fees, and schedules may change without notice.'
+              },
+              {
+                title: 'Registration and payment',
+                body: 'Registration is completed in your browser. This site does not maintain a server-side registration database or process payments. Venmo payments are made directly between you and the designated payee. Sending email or SMS through this site does not confirm tournament entry, and we do not verify payment through the website.'
+              },
+              {
+                title: 'Your responsibilities',
+                body: 'Information you enter remains on your device until you choose to email, text, download a PDF, or open a payment app. You are responsible for the accuracy of information you provide and for actions taken from your device or accounts. You may not misuse the site, attempt unauthorized access, scrape content, or interfere with site operation.'
+              },
+              {
+                title: 'Intellectual property',
+                body: 'Site content—including tournament names, logos, images, schedules, and text—is owned by Michigan Players Golf Club or its licensors and may not be copied, republished, or reused without written permission.'
+              },
+              {
+                title: 'Third-party services',
+                body: 'Maps, fonts, PDF tools, email, SMS, and payment services linked from this site are operated by third parties with their own terms and privacy policies. Michigan Players Golf Club is not responsible for those services or their availability.'
+              },
+              {
+                title: 'Disclaimers',
+                emphasis: true,
+                body: 'This site is provided "as is" and "as available," without warranties of any kind, to the fullest extent permitted by law. Michigan Players Golf Club is not liable for indirect, incidental, or consequential damages arising from use of this site, including schedule changes, failed submissions, payment disputes, lost data, or third-party outages. You use this site at your own risk.'
+              },
+              {
+                title: 'Governing law',
+                body: 'These Terms are governed by the laws of the State of Michigan. Disputes relating to this site or these Terms are subject to the jurisdiction of courts in Michigan, where permitted by law. Questions about the tournament or registration may be directed through the Contact page.'
+              }
+            ]
           },
           {
-            title: 'Disclaimer',
-            emphasis: true,
-            body: 'This website and its tools are provided "as is" and "as available," without warranties of any kind. To the fullest extent permitted by law, Michigan Players Golf Club is not liable for errors, schedule changes, failed submissions, payment disputes, lost data, device issues, or any damages arising from your use of this site. You use this site at your own risk.'
+            id: 'privacy',
+            label: 'Privacy Policy',
+            dialogTitle: 'Privacy Policy',
+            intro: 'Michigan Players Golf Club ("we," "us," or "our") explains below how we handle information when you visit michiganplayersgolfclub.com.',
+            closingNote: 'Last updated August 2026. We may update this Privacy Policy by posting a revised version on this site.',
+            sections: [
+              {
+                title: 'Who we are',
+                body: `Michigan Players Golf Club operates this website from Michigan, United States. Privacy inquiries: ${publicContactEmail} (subject line: Privacy).`
+              },
+              {
+                title: 'Information we collect',
+                body: 'We do not operate user accounts or a server-side registration database. Our hosting provider may collect standard technical information such as IP address, browser type, and pages visited. If you contact us by email or SMS, we receive the information you choose to send, such as your name, contact details, and registration information. Registration forms are processed in your browser and may be saved temporarily in session storage until you finish or close your session.'
+              },
+              {
+                title: 'How we use information',
+                body: 'We use information to operate and secure the website, respond to inquiries, and administer tournament registration you submit to us. We do not sell personal information or use it for cross-site advertising.'
+              },
+              {
+                title: 'Cookies and storage',
+                body: 'This site does not use advertising cookies or tracking pixels. We may use browser session storage to support the registration flow. You can clear this data by completing registration or closing your browser session.'
+              },
+              {
+                title: 'Third-party services',
+                body: 'We use hosting and content delivery services, map tiles, and optional third-party scripts for maps and PDF generation. Email, SMS, Venmo, and similar services you choose to use are governed by their own privacy policies.'
+              },
+              {
+                title: 'Retention and security',
+                body: 'Registration drafts in your browser are cleared when you finish or end your session. Messages you send us are retained only as long as needed for tournament administration and legal requirements. We use HTTPS and standard security controls appropriate for a public website, but no online system is completely secure.'
+              },
+              {
+                title: 'Your privacy rights',
+                body: `Depending on where you live, you may have rights to access, correct, delete, or receive a copy of personal information we hold, and to opt out of certain uses. We do not sell or share personal information as defined under the California Consumer Privacy Act (CCPA/CPRA) and similar state laws. To make a request, email ${publicContactEmail} with "Privacy Request" in the subject line. We will not discriminate against you for exercising privacy rights.`
+              },
+              {
+                title: 'Children',
+                body: 'This site is not directed to children under 13, and we do not knowingly collect personal information from children under 13 online.'
+              },
+              {
+                title: 'Contact',
+                body: `Questions about this Privacy Policy: ${publicContactEmail} or the Contact page.`
+              }
+            ]
           },
           {
-            title: 'Contact',
-            body: 'For tournament, registration, or payment questions, use the Contact page.'
+            id: 'accessibility',
+            label: 'Accessibility',
+            dialogTitle: 'Accessibility Statement',
+            intro: 'Michigan Players Golf Club is committed to making this website accessible to visitors with disabilities.',
+            closingNote: 'Last updated August 2026.',
+            sections: [
+              {
+                title: 'Our standard',
+                body: 'We aim to conform with WCAG 2.1 Level AA. Because this site includes third-party content such as maps and external payment links, some areas may not yet fully meet that standard.'
+              },
+              {
+                title: 'Measures we take',
+                body: 'We use semantic HTML, descriptive headings, text alternatives for meaningful images, keyboard-accessible navigation, visible focus indicators, labeled form fields, and responsive layouts for mobile and desktop users.'
+              },
+              {
+                title: 'Known limitations',
+                body: 'Embedded maps, external payment links, PDF downloads, and some third-party scripts may present accessibility barriers. PDF accessibility also depends on your device and reader software.'
+              },
+              {
+                title: 'Request assistance',
+                body: `If you need help using this site or want tournament information in another format, contact us through the Contact page or email ${publicContactEmail} with "Accessibility" in the subject line. Include the page address and a brief description of the issue.`
+              },
+              {
+                title: 'Feedback',
+                body: 'We welcome accessibility feedback and work to address reported barriers in future updates.'
+              }
+            ]
+          },
+          {
+            id: 'do-not-sell',
+            label: 'Do Not Sell or Share My Personal Information',
+            dialogTitle: 'Do Not Sell or Share My Personal Information',
+            intro: 'This notice describes how Michigan Players Golf Club handles requests related to the sale or sharing of personal information under U.S. state privacy laws, including the California Consumer Privacy Act (CCPA/CPRA).',
+            closingNote: 'Last updated August 2026.',
+            sections: [
+              {
+                title: 'We do not sell or share',
+                body: 'We do not sell personal information. We do not share personal information for cross-context behavioral advertising or for monetary or other valuable consideration as defined under applicable privacy laws.'
+              },
+              {
+                title: 'Information on this site',
+                body: 'Registration data is processed in your browser and is not automatically submitted to our servers. We do not use advertising trackers or data brokers. If you contact us directly, we use that information only for tournament administration and communication.'
+              },
+              {
+                title: 'Your choices',
+                body: `Because we do not sell or share personal information, no separate opt-out is required for those activities. You may still contact us to request access to, correction of, or deletion of personal information we received from you. Email ${publicContactEmail} with "Do Not Sell or Share" or "Privacy Request" in the subject line.`
+              },
+              {
+                title: 'Non-discrimination',
+                body: 'We will not deny services or provide a different level of service because you exercised privacy rights under applicable law.'
+              },
+              {
+                title: 'Contact',
+                body: `Privacy requests: ${publicContactEmail} or the Contact page.`
+              }
+            ]
           }
         ]
       }
@@ -705,7 +858,6 @@ const deepFreeze = (value) => {
 
 const SiteConfig = deepFreeze({
   config: siteConfig,
-  deepFreeze,
   getNavigation,
   getDefaultRoute,
   getBrand,

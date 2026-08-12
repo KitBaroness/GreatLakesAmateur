@@ -65,13 +65,17 @@ const createLocationListMarkup = (locations) => (
  * @param {Function} DivIcon
  * @returns {Object}
  */
-const createLocationMarkerIcon = (location, DivIcon) => new DivIcon({
-  className: `c-location-map__marker c-location-map__marker--${location.type}`,
-  html: `<span>${location.type === 'event' ? 'E' : 'H'}</span>`,
-  iconSize: [34, 34],
-  iconAnchor: [17, 17],
-  popupAnchor: [0, -17]
-});
+const createLocationMarkerIcon = (location, DivIcon) => {
+  const markerType = location.type === 'hotel' ? 'hotel' : 'event';
+
+  return new DivIcon({
+    className: `c-location-map__marker c-location-map__marker--${markerType}`,
+    html: `<span>${markerType === 'event' ? 'E' : 'H'}</span>`,
+    iconSize: [34, 34],
+    iconAnchor: [17, 17],
+    popupAnchor: [0, -17]
+  });
+};
 
 /**
  * @pure

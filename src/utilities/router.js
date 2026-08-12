@@ -35,6 +35,19 @@ const normalizePath = (path) => {
 };
 
 /**
+ * @pure
+ * @param {String} path
+ * @returns {String}
+ */
+const getHashQuerySuffix = (path) => {
+  const raw = String(path || '').trim();
+  const withoutHash = raw.startsWith('#') ? raw.slice(1) : raw;
+  const queryIndex = withoutHash.indexOf('?');
+
+  return queryIndex >= 0 ? withoutHash.slice(queryIndex) : '';
+};
+
+/**
  * @effect
  * @returns {String}
  */
@@ -237,14 +250,16 @@ export const createRouter = (config, options = {}) => {
     const route = findRoute(routes, requestedPath) || findRoute(routes, defaultRoute);
     const resolvedPath = route.redirect || route.path;
     const resolvedRoute = route.redirect ? findRoute(routes, resolvedPath) : route;
+    const hashQuerySuffix = getHashQuerySuffix(path);
+    const targetHash = `${resolvedPath}${hashQuerySuffix}`;
     const contentHost = document.getElementById(containerId);
 
     if (!contentHost || !resolvedRoute) {
       return;
     }
 
-    if (shouldUpdateHash && window.location.hash !== `#${resolvedPath}`) {
-      window.location.hash = resolvedPath;
+    if (shouldUpdateHash && window.location.hash !== `#${targetHash}`) {
+      window.location.hash = targetHash;
       return;
     }
 
