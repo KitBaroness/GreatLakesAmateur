@@ -223,18 +223,37 @@ const ensureLiveScoringPreconnect = (config) => {
   try {
     const origin = new URL(embedUrl).origin;
 
-    if (document.querySelector(`link[data-live-scoring-preconnect="${origin}"]`)) {
-      return;
-    }
+    [
+      { rel: 'dns-prefetch', crossOrigin: false, attr: 'data-live-scoring-preconnect' },
+      { rel: 'preconnect', crossOrigin: true, attr: 'data-live-scoring-preconnect' }
+    ].forEach(({ rel, crossOrigin, attr }) => {
+      const marker = `${attr}="${origin}"`;
 
-    const link = document.createElement('link');
-    link.rel = 'preconnect';
-    link.href = origin;
-    link.crossOrigin = 'anonymous';
-    link.setAttribute('data-live-scoring-preconnect', origin);
-    document.head.appendChild(link);
+      if (document.querySelector(`link[${marker}][rel="${rel}"]`)) {
+        return;
+      }
+
+      const link = document.createElement('link');
+      link.rel = rel;
+      link.href = origin;
+
+      if (crossOrigin) {
+        link.crossOrigin = 'anonymous';
+      }
+
+      link.setAttribute(attr, origin);
+      document.head.appendChild(link);
+    });
+
+    if (!document.querySelector(`link[data-live-scoring-prefetch="${embedUrl}"]`)) {
+      const prefetch = document.createElement('link');
+      prefetch.rel = 'prefetch';
+      prefetch.href = embedUrl;
+      prefetch.setAttribute('data-live-scoring-prefetch', embedUrl);
+      document.head.appendChild(prefetch);
+    }
   } catch {
-    // Invalid embed URL; skip preconnect.
+    // Invalid embed URL; skip resource hints.
   }
 };
 

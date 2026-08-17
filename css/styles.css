@@ -1163,31 +1163,12 @@ textarea:focus-visible {
   padding: 0 24px 72px;
 }
 
-.c-live-scoring__mobile-panel {
-  padding: 22px 20px;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background: var(--color-surface);
-  box-shadow: var(--shadow-soft);
-  text-align: center;
-}
-
-.c-live-scoring__mobile-copy {
-  margin: 0 0 16px;
-  color: var(--color-ink);
-  font-size: 1rem;
-  line-height: 1.55;
-}
-
-.c-live-scoring__mobile-open {
-  width: min(100%, 320px);
-}
-
-.c-live-scoring__mobile-note {
-  margin: 14px 0 0;
+.c-live-scoring__note {
+  margin: 0 0 12px;
   color: var(--color-muted);
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   line-height: 1.5;
+  text-align: center;
 }
 
 .c-live-scoring__status {
@@ -1205,11 +1186,23 @@ textarea:focus-visible {
 
 .c-live-scoring__embed {
   position: relative;
-  overflow: hidden;
+  width: 100%;
+  height: min(78vh, 960px);
+  min-height: min(78vh, 960px);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   background: #fff;
   box-shadow: var(--shadow-soft);
+}
+
+.c-live-scoring__viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y pinch-zoom;
 }
 
 .c-live-scoring__loading {
@@ -1218,10 +1211,12 @@ textarea:focus-visible {
   z-index: 1;
   display: grid;
   place-items: center;
+  gap: 12px;
   padding: 24px;
   color: var(--color-muted);
   background: rgba(255, 255, 255, 0.96);
   font-size: 0.95rem;
+  text-align: center;
 }
 
 .c-live-scoring__loading[hidden] {
@@ -1231,29 +1226,57 @@ textarea:focus-visible {
 .c-live-scoring__frame {
   display: block;
   width: 100%;
-  min-height: min(78vh, 960px);
+  height: 100%;
+  min-width: 100%;
+  min-height: 100%;
   border: 0;
   background: #fff;
 }
 
-.c-live-scoring__note {
-  margin: 14px 0 0;
-  color: var(--color-muted);
-  font-size: 0.92rem;
-  line-height: 1.5;
+.c-live-scoring__fallback {
+  margin-top: 14px;
+  padding: 18px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-soft);
   text-align: center;
 }
 
+.c-live-scoring__fallback-copy {
+  margin: 0 0 12px;
+  color: var(--color-ink);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.c-live-scoring__fallback-open {
+  width: min(100%, 320px);
+}
+
 .c-live-scoring__external {
-  margin: 18px 0 0;
+  margin: 14px 0 0;
   text-align: center;
 }
 
 .c-live-scoring__external-link {
-  color: var(--color-lake);
-  font-weight: 650;
+  color: var(--color-muted);
+  font-size: 0.88rem;
+  font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 0.15em;
+}
+
+.c-live-scoring__external-link:hover {
+  color: var(--color-lake);
+}
+
+body.is-live-scoring-page {
+  overflow-x: auto;
+  touch-action: pan-x pan-y pinch-zoom;
+}
+
+body.is-live-scoring-page .c-app__content {
+  overflow: visible;
 }
 
 .c-contact {
@@ -2249,11 +2272,53 @@ textarea:focus-visible {
   }
 
   .c-live-scoring {
-    padding: 0 20px 56px;
+    display: flex;
+    width: 100%;
+    max-width: none;
+    min-height: calc(100dvh - 4.75rem);
+    padding: 0 0 12px;
+    flex-direction: column;
   }
 
+  .c-live-scoring__note {
+    padding: 0 12px;
+  }
+
+  .c-live-scoring__embed {
+    flex: 1 1 auto;
+    width: 100%;
+    height: var(--live-scoring-embed-height, calc(100dvh - 13.5rem));
+    min-height: var(--live-scoring-embed-height, calc(100dvh - 13.5rem));
+    margin: 0;
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+  }
+
+  .c-live-scoring__viewport {
+    width: 100%;
+    height: 100%;
+  }
+
+  .c-live-scoring__frame {
+    width: 100%;
+    height: 100%;
+    min-width: 100%;
+    min-height: 100%;
+  }
+
+  .c-live-scoring__fallback,
   .c-live-scoring__external {
-    display: none;
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .c-live-scoring__external-link {
+    font-size: 0.84rem;
+  }
+
+  .c-page-header--compact {
+    padding: 24px 12px;
   }
 }
 
@@ -2567,11 +2632,25 @@ textarea:focus-visible {
   }
 
   .c-live-scoring {
-    padding: 0 16px 48px;
+    min-height: calc(100dvh - 4.25rem);
+    padding-bottom: 10px;
   }
 
-  .c-live-scoring__mobile-panel {
-    padding: 20px 16px;
+  .c-live-scoring__embed {
+    height: var(--live-scoring-embed-height, calc(100dvh - 12.5rem));
+    min-height: var(--live-scoring-embed-height, calc(100dvh - 12.5rem));
+  }
+
+  .c-live-scoring__fallback {
+    padding: 16px 14px;
+  }
+
+  .c-page-header--compact {
+    padding: 20px 10px;
+  }
+
+  .c-page-header--compact .c-page-header__title {
+    font-size: 1.5rem;
   }
 
   .c-event-details__prizes {

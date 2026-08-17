@@ -5,7 +5,10 @@
 import SiteConfig from '../../core/site-config.js';
 
 const ROOT_SELECTOR = '[data-live-scoring-root]';
-const MOBILE_EMBED_QUERY = '(max-width: 1180px)';
+const COMPACT_QUERY = '(max-width: 1180px)';
+const LOAD_TIMEOUT_MS = 12000;
+const EMBED_HEIGHT_FLOOR = 280;
+const PAGE_CLASS = 'is-live-scoring-page';
 
 let mediaCleanup = null;
 
@@ -23,23 +26,107 @@ const isLiveScoringActive = (liveScoring) => Boolean(
  * @param {String} embedUrl
  * @returns {void}
  */
-const ensureLiveScoringPreconnect = (embedUrl) => {
+const ensureLiveScoringHints = (embedUrl) => {
   try {
     const origin = new URL(embedUrl).origin;
 
-    if (document.querySelector(`link[data-live-scoring-preconnect="${origin}"]`)) {
+    [
+      { rel: 'dns-prefetch', crossOrigin: false },
+      { rel: 'preconnect', crossOrigin: true }
+    ].forEach(({ rel, crossOrigin }) => {
+      const key = `data-live-scoring-${rel}="${origin}"`;
+
+      if (document.querySelector(`link[${key}]`)) {
+        return;
+      }
+
+      const link = document.createElement('link');
+      link.rel = rel;
+      link.href = origin;
+
+      if (crossOrigin) {
+        link.crossOrigin = 'anonymous';
+      }
+
+      link.setAttribute(`data-live-scoring-${rel}`, origin);
+      document.head.appendChild(link);
+    });
+
+    if (!document.querySelector(`link[data-live-scoring-prefetch="${embedUrl}"]`)) {
+      const prefetch = document.createElement('link');
+      prefetch.rel = 'prefetch';
+      prefetch.href = embedUrl;
+      prefetch.setAttribute('data-live-scoring-prefetch', embedUrl);
+      document.head.appendChild(prefetch);
+    }
+  } catch {
+    // Invalid embed URL; skip resource hints.
+  }
+};
+
+/**
+ * @effect
+ * @param {Boolean} active
+ * @returns {void}
+ */
+const toggleLiveScoringPageClass = (active) => {
+  document.body.classList.toggle(PAGE_CLASS, active);
+};
+
+/**
+ * @effect
+ * @param {HTMLElement} embedHost
+ * @param {HTMLElement} root
+ * @returns {Function}
+ */
+const bindEmbedViewport = (embedHost, root) => {
+  if (!embedHost) {
+    return () => {};
+  }
+
+  const media = window.matchMedia(COMPACT_QUERY);
+
+  const syncEmbedViewport = () => {
+    if (!media.matches) {
+      embedHost.style.removeProperty('height');
+      embedHost.style.removeProperty('min-height');
+      root.style.removeProperty('--live-scoring-embed-height');
       return;
     }
 
-    const link = document.createElement('link');
-    link.rel = 'preconnect';
-    link.href = origin;
-    link.crossOrigin = 'anonymous';
-    link.setAttribute('data-live-scoring-preconnect', origin);
-    document.head.appendChild(link);
-  } catch {
-    // Invalid embed URL; skip preconnect.
-  }
+    const header = document.querySelector('.c-site-header');
+    const pageHeader = document.querySelector('.c-page-header--compact');
+    const footerNote = root.querySelector('[data-live-scoring-note]');
+    const external = root.querySelector('.c-live-scoring__external');
+    const fallback = root.querySelector('[data-live-scoring-fallback]');
+    const reserved = 16
+      + (footerNote?.offsetHeight || 0)
+      + (external?.offsetHeight || 0)
+      + (fallback?.hidden === false ? fallback.offsetHeight : 0);
+    const top = (header?.offsetHeight || 76) + (pageHeader?.offsetHeight || 108);
+    const viewport = window.visualViewport?.height ?? window.innerHeight;
+    const height = Math.max(EMBED_HEIGHT_FLOOR, Math.round(viewport - top - reserved));
+
+    embedHost.style.height = `${height}px`;
+    embedHost.style.minHeight = `${height}px`;
+    root.style.setProperty('--live-scoring-embed-height', `${height}px`);
+  };
+
+  syncEmbedViewport();
+  media.addEventListener('change', syncEmbedViewport);
+  window.addEventListener('resize', syncEmbedViewport);
+  window.visualViewport?.addEventListener('resize', syncEmbedViewport);
+  window.visualViewport?.addEventListener('scroll', syncEmbedViewport);
+
+  return () => {
+    media.removeEventListener('change', syncEmbedViewport);
+    window.removeEventListener('resize', syncEmbedViewport);
+    window.visualViewport?.removeEventListener('resize', syncEmbedViewport);
+    window.visualViewport?.removeEventListener('scroll', syncEmbedViewport);
+    embedHost.style.removeProperty('height');
+    embedHost.style.removeProperty('min-height');
+    root.style.removeProperty('--live-scoring-embed-height');
+  };
 };
 
 /**
@@ -47,56 +134,87 @@ const ensureLiveScoringPreconnect = (embedUrl) => {
  * @param {HTMLIFrameElement} frame
  * @param {HTMLElement} loading
  * @param {String} embedUrl
+ * @param {Function} onFallback
  * @returns {Function}
  */
-const loadDesktopEmbed = (frame, loading, embedUrl) => {
+const loadEmbed = (frame, loading, embedUrl, onFallback) => {
   if (!frame || !embedUrl) {
     return () => {};
   }
 
-  const showLoading = () => {
-    if (loading) {
-      loading.hidden = false;
-      loading.setAttribute('aria-busy', 'true');
+  let settled = false;
+  let timeoutId = 0;
+
+  const showLoading = (message) => {
+    if (!loading) return;
+
+    loading.hidden = false;
+    loading.setAttribute('aria-busy', 'true');
+
+    if (message) {
+      loading.textContent = message;
     }
   };
 
   const hideLoading = () => {
-    if (loading) {
-      loading.hidden = true;
-      loading.setAttribute('aria-busy', 'false');
-    }
+    if (!loading) return;
+
+    loading.hidden = true;
+    loading.setAttribute('aria-busy', 'false');
   };
 
-  const handleLoad = () => hideLoading();
-  const handleError = () => {
-    hideLoading();
-    if (loading) {
-      loading.textContent = 'Live results could not be loaded here. Use Open full results on Golf Genius below.';
-      loading.hidden = false;
+  const settle = (success, message) => {
+    if (settled) return;
+
+    settled = true;
+    window.clearTimeout(timeoutId);
+
+    if (success) {
+      hideLoading();
+      return;
     }
+
+    if (message && loading) {
+      loading.textContent = message;
+      loading.hidden = false;
+      loading.setAttribute('aria-busy', 'false');
+    } else {
+      hideLoading();
+    }
+
+    onFallback(message);
   };
+
+  const handleLoad = () => settle(true);
+  const handleError = () => settle(
+    false,
+    'Live results could not be loaded here. Use the Golf Genius link below if needed.'
+  );
 
   frame.addEventListener('load', handleLoad);
   frame.addEventListener('error', handleError);
 
-  showLoading();
+  showLoading('Loading live results...');
+  timeoutId = window.setTimeout(
+    () => settle(false),
+    LOAD_TIMEOUT_MS
+  );
 
-  if (!frame.getAttribute('src')) {
-    frame.src = embedUrl;
-  } else if (frame.getAttribute('src') !== embedUrl) {
+  if (frame.getAttribute('src') !== embedUrl) {
     frame.src = embedUrl;
   } else {
     try {
       if (frame.contentDocument?.readyState === 'complete') {
-        hideLoading();
+        settle(true);
       }
     } catch {
-      // Cross-origin frame; rely on the load event.
+      // Cross-origin frame; rely on load event or timeout.
     }
   }
 
   return () => {
+    settled = true;
+    window.clearTimeout(timeoutId);
     frame.removeEventListener('load', handleLoad);
     frame.removeEventListener('error', handleError);
   };
@@ -109,25 +227,25 @@ const loadDesktopEmbed = (frame, loading, embedUrl) => {
  * @returns {Function}
  */
 const renderActiveLiveScoring = (root, liveScoring) => {
-  const mobilePanel = root.querySelector('[data-live-scoring-mobile-panel]');
-  const mobileOpen = root.querySelector('[data-live-scoring-mobile-open]');
+  const fallbackPanel = root.querySelector('[data-live-scoring-fallback]');
+  const fallbackOpen = root.querySelector('[data-live-scoring-fallback-open]');
   const embedHost = root.querySelector('[data-live-scoring-embed]');
   const frame = root.querySelector('[data-live-scoring-frame]');
   const loading = root.querySelector('[data-live-scoring-loading]');
   const note = root.querySelector('[data-live-scoring-note]');
   const externalLink = root.querySelector('[data-live-scoring-external]');
   const subtitle = document.querySelector('[data-live-scoring-subtitle]');
-  const media = window.matchMedia(MOBILE_EMBED_QUERY);
   let embedCleanup = () => {};
+  let heightCleanup = () => {};
 
-  ensureLiveScoringPreconnect(liveScoring.embedUrl);
+  ensureLiveScoringHints(liveScoring.embedUrl);
 
   if (frame) {
     frame.title = liveScoring.iframeTitle || 'Great Lakes Amateur live tournament results';
   }
 
-  if (mobileOpen) {
-    mobileOpen.href = liveScoring.externalUrl;
+  if (fallbackOpen) {
+    fallbackOpen.href = liveScoring.externalUrl;
   }
 
   if (externalLink) {
@@ -144,47 +262,28 @@ const renderActiveLiveScoring = (root, liveScoring) => {
     subtitle.textContent = liveScoring.refreshNote;
   }
 
-  const applyLayout = () => {
-    embedCleanup();
-
-    if (media.matches) {
-      if (mobilePanel) {
-        mobilePanel.hidden = false;
-      }
-
-      if (embedHost) {
-        embedHost.hidden = true;
-      }
-
-      if (frame) {
-        frame.removeAttribute('src');
-      }
-
-      if (loading) {
-        loading.hidden = true;
-        loading.setAttribute('aria-busy', 'false');
-      }
-
-      return;
+  const showFallback = () => {
+    if (fallbackPanel) {
+      fallbackPanel.hidden = false;
     }
-
-    if (mobilePanel) {
-      mobilePanel.hidden = true;
-    }
-
-    if (embedHost) {
-      embedHost.hidden = false;
-    }
-
-    embedCleanup = loadDesktopEmbed(frame, loading, liveScoring.embedUrl);
   };
 
-  applyLayout();
-  media.addEventListener('change', applyLayout);
+  if (embedHost) {
+    embedHost.hidden = false;
+  }
+
+  if (fallbackPanel) {
+    fallbackPanel.hidden = true;
+  }
+
+  heightCleanup = bindEmbedViewport(embedHost, root);
+  embedCleanup = loadEmbed(frame, loading, liveScoring.embedUrl, showFallback);
+  toggleLiveScoringPageClass(true);
 
   return () => {
-    media.removeEventListener('change', applyLayout);
+    toggleLiveScoringPageClass(false);
     embedCleanup();
+    heightCleanup();
   };
 };
 
@@ -210,6 +309,7 @@ const renderInactiveLiveScoring = (root) => {
  * @returns {void}
  */
 const resetLiveScoring = () => {
+  toggleLiveScoringPageClass(false);
   mediaCleanup?.();
   mediaCleanup = null;
 };
