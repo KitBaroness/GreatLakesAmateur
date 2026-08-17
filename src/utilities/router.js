@@ -209,13 +209,19 @@ const syncHomeHeroPreload = (path) => {
  * @param {String} currentPath
  * @returns {void}
  */
-const prefetchLikelyViews = (routes, version, currentPath) => {
+const prefetchLikelyViews = (routes, version, currentPath, config) => {
   if (!isHomePath(currentPath) || typeof window.requestIdleCallback !== 'function') {
     return;
   }
 
+  const paths = [...PREFETCH_PATHS];
+
+  if (config?.liveScoring?.enabled && config.liveScoring.route) {
+    paths.push(config.liveScoring.route);
+  }
+
   window.requestIdleCallback(() => {
-    PREFETCH_PATHS.forEach((path) => {
+    paths.forEach((path) => {
       if (path === normalizePath(currentPath)) {
         return;
       }
@@ -270,7 +276,7 @@ export const createRouter = (config, options = {}) => {
         requestAnimationFrame(() => {
           applyMetadata(resolvedRoute, config.seo);
           syncHomeHeroPreload(resolvedPath);
-          prefetchLikelyViews(routes, config.version, resolvedPath);
+          prefetchLikelyViews(routes, config.version, resolvedPath, config);
           document.getElementById('app')?.focus({ preventScroll: true });
           emitRouteChange({
             path: resolvedPath,
@@ -288,7 +294,7 @@ export const createRouter = (config, options = {}) => {
         contentHost.innerHTML = pageMarkup;
         applyMetadata(resolvedRoute, config.seo);
         syncHomeHeroPreload(resolvedPath);
-        prefetchLikelyViews(routes, config.version, resolvedPath);
+        prefetchLikelyViews(routes, config.version, resolvedPath, config);
         document.getElementById('app')?.focus({ preventScroll: true });
         window.scrollTo(0, 0);
         emitRouteChange({

@@ -59,9 +59,19 @@ const createHeaderMarkup = (config, currentPath) => {
         <a class="${linkClass('c-site-header__link', 'c-site-header__link--active', item.route, activePath)}" href="${toHash(item.route)}"${ariaCurrent(item.route, activePath)}>${escapeHtml(item.label)}</a>
       `.trim()).join('');
 
-  const actionMarkup = actions.map((action) => `
-        <a class="${ctaClass(action.variant)}" href="${toHash(action.route)}">${escapeHtml(action.label)}</a>
-      `.trim()).join('');
+  const actionMarkup = actions.map((action) => {
+    const actionTypeClass = action.label === 'Tournament'
+      ? 'c-site-header__action--tournament'
+      : 'c-site-header__action--register';
+
+    return `
+        <a
+          class="${linkClass(`${ctaClass(action.variant)} c-site-header__action ${actionTypeClass}`, 'c-site-header__action--active', action.route, activePath)}"
+          href="${toHash(action.route)}"
+          ${ariaCurrent(action.route, activePath)}
+        >${escapeHtml(action.label)}</a>
+      `.trim();
+  }).join('');
 
   return `
     <div class="c-site-header__inner">

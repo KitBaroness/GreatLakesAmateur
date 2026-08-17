@@ -182,6 +182,10 @@ const bindGlobalInteractions = () => {
     if (event.target.closest('.c-mobile-nav__link')) {
       closeMobileNavigation();
     }
+
+    if (event.target.closest('.c-site-header__brand')) {
+      closeMobileNavigation();
+    }
   });
 
   document.addEventListener('keydown', (event) => {
@@ -208,6 +212,34 @@ const bindSessionPrivacyGuards = () => {
 
 /**
  * @effect
+ * @param {Object} config
+ * @returns {void}
+ */
+const ensureLiveScoringPreconnect = (config) => {
+  const embedUrl = config.liveScoring?.enabled ? config.liveScoring.embedUrl : '';
+
+  if (!embedUrl) return;
+
+  try {
+    const origin = new URL(embedUrl).origin;
+
+    if (document.querySelector(`link[data-live-scoring-preconnect="${origin}"]`)) {
+      return;
+    }
+
+    const link = document.createElement('link');
+    link.rel = 'preconnect';
+    link.href = origin;
+    link.crossOrigin = 'anonymous';
+    link.setAttribute('data-live-scoring-preconnect', origin);
+    document.head.appendChild(link);
+  } catch {
+    // Invalid embed URL; skip preconnect.
+  }
+};
+
+/**
+ * @effect
  * @returns {void}
  */
 const initializeApp = () => {
@@ -217,6 +249,8 @@ const initializeApp = () => {
     console.error('[FlexNet] Missing site configuration.');
     return;
   }
+
+  ensureLiveScoringPreconnect(config);
 
   logDeveloperSignature(config);
   renderHeader(config, getPathFromHash());

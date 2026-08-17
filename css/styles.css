@@ -172,6 +172,13 @@ textarea:focus-visible {
   flex: 0 0 auto;
   align-items: center;
   min-width: 0;
+  cursor: pointer;
+}
+
+.c-site-header__brand:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 4px;
+  border-radius: 4px;
 }
 
 .c-site-header__logo {
@@ -232,6 +239,16 @@ textarea:focus-visible {
 
 .c-site-header__actions .c-button {
   white-space: nowrap;
+}
+
+.c-site-header__action--active.c-button--secondary {
+  color: var(--color-surface);
+  background: var(--color-lake);
+  border-color: var(--color-lake);
+}
+
+.c-site-header__action--active.c-button--primary {
+  filter: brightness(1.05);
 }
 
 .c-site-header__toggle {
@@ -486,6 +503,19 @@ textarea:focus-visible {
   margin: 12px auto 0;
   color: rgba(255, 255, 255, 0.86);
   font-size: 1rem;
+}
+
+.c-page-header--compact {
+  padding: 42px 24px;
+}
+
+.c-page-header--compact .c-page-header__title {
+  font-size: 2.35rem;
+}
+
+.c-page-header--compact .c-page-header__subtitle {
+  margin-top: 10px;
+  font-size: 0.95rem;
 }
 
 .c-content {
@@ -1133,6 +1163,33 @@ textarea:focus-visible {
   padding: 0 24px 72px;
 }
 
+.c-live-scoring__mobile-panel {
+  padding: 22px 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+}
+
+.c-live-scoring__mobile-copy {
+  margin: 0 0 16px;
+  color: var(--color-ink);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.c-live-scoring__mobile-open {
+  width: min(100%, 320px);
+}
+
+.c-live-scoring__mobile-note {
+  margin: 14px 0 0;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
 .c-live-scoring__status {
   padding: 24px;
   border: 1px solid var(--color-border);
@@ -1147,11 +1204,28 @@ textarea:focus-visible {
 }
 
 .c-live-scoring__embed {
+  position: relative;
   overflow: hidden;
   border: 1px solid var(--color-border);
   border-radius: 8px;
   background: #fff;
   box-shadow: var(--shadow-soft);
+}
+
+.c-live-scoring__loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  color: var(--color-muted);
+  background: rgba(255, 255, 255, 0.96);
+  font-size: 0.95rem;
+}
+
+.c-live-scoring__loading[hidden] {
+  display: none;
 }
 
 .c-live-scoring__frame {
@@ -2099,15 +2173,43 @@ textarea:focus-visible {
 @media (max-width: 1180px) {
   .c-site-header__inner {
     min-height: 76px;
+    justify-content: flex-start;
   }
 
-  .c-site-header__nav,
-  .c-site-header__actions {
+  .c-site-header__brand {
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+    max-width: calc(100% - 168px);
+    min-height: 44px;
+    padding: 4px 0;
+  }
+
+  .c-site-header__nav {
     display: none;
+  }
+
+  .c-site-header__actions {
+    display: flex;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  .c-site-header__action--register {
+    display: none;
+  }
+
+  .c-site-header__action--tournament {
+    min-height: 40px;
+    padding: 0 14px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   .c-site-header__toggle {
     display: flex;
+    flex-shrink: 0;
   }
 
   .c-site-header__logo {
@@ -2145,6 +2247,14 @@ textarea:focus-visible {
   .c-activity__media--tall {
     min-height: 360px;
   }
+
+  .c-live-scoring {
+    padding: 0 20px 56px;
+  }
+
+  .c-live-scoring__external {
+    display: none;
+  }
 }
 
 @media (max-width: 760px) {
@@ -2154,6 +2264,17 @@ textarea:focus-visible {
 
   .c-site-header__inner {
     padding: 10px 18px;
+    gap: 10px;
+  }
+
+  .c-site-header__brand {
+    max-width: calc(100% - 152px);
+  }
+
+  .c-site-header__action--tournament {
+    min-height: 38px;
+    padding: 0 12px;
+    font-size: 11px;
   }
 
   .c-mobile-nav {
@@ -2424,6 +2545,14 @@ textarea:focus-visible {
     padding: 38px 16px;
   }
 
+  .c-page-header--compact {
+    padding: 28px 16px;
+  }
+
+  .c-page-header--compact .c-page-header__title {
+    font-size: 1.65rem;
+  }
+
   .c-page-header__title {
     font-size: 1.78rem;
   }
@@ -2435,6 +2564,14 @@ textarea:focus-visible {
   .c-event-details {
     padding-right: 16px;
     padding-left: 16px;
+  }
+
+  .c-live-scoring {
+    padding: 0 16px 48px;
+  }
+
+  .c-live-scoring__mobile-panel {
+    padding: 20px 16px;
   }
 
   .c-event-details__prizes {
