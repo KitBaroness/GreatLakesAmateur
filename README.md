@@ -125,7 +125,7 @@ The site targets fast first paint on mobile networks without a Node build step.
 
 ### Load strategy
 
-- **Route view code splitting**: `src/utilities/routeViewModules.js` dynamically imports registration, map, and sponsorship modules only when their route is visited (or when cleanup is needed after leaving).
+- **Route view code splitting**: `src/utilities/routeViewModules.js` dynamically imports registration, map, sponsorship, and live-scoring modules only when their route is visited (or when cleanup is needed after leaving).
 - **Versioned view fetches**: The router requests `public/views/...?v=<config.version>` so repeat visits can reuse cached fragments from the browser or Cloudflare CDN.
 - **Idle prefetch**: From the home route, likely next pages (`#/event-details`, `#/register`) are prefetched during browser idle time.
 - **Route-aware hero preload**: `index.html` preloads the home hero AVIF for first paint; `router.js` re-applies preload when visitors return to `#/home`.
@@ -265,6 +265,22 @@ flowchart TD
 ```
 
 Traceability depends on shared registration details in the Venmo note and invoice:
+
+### Live scoring (Golf Genius)
+
+Tournament results are embedded from [Golf Genius](https://docs.golfgenius.com/en/articles/10777938-using-iframes) using an official iframe widget. Golf Genius updates the leaderboard on their servers; this site displays it at `#/live-scoring` without manual score entry or a Node backend.
+
+Configure `liveScoring` in `src/core/site-config.js`:
+
+| Field | Purpose |
+|-------|---------|
+| `enabled` | Activates the live embed and points the header **Tournament** button to `#/live-scoring` |
+| `embedUrl` | Golf Genius widget URL (iframe `src`) |
+| `externalUrl` | Full results page link for visitors who want Golf Genius directly |
+
+To change embed options (for example **Most current in progress round**), open the results page in the Golf Genius member portal, click **Share**, choose iframe settings, and paste the generated URL into `embedUrl`. See [Golf Genius iframe docs](https://docs.golfgenius.com/en/articles/10777938-using-iframes).
+
+When the tournament ends, set `liveScoring.enabled` to `false` to restore the header **Tournament** button to Event Details.
 
 | Field | Where it appears |
 |-------|------------------|

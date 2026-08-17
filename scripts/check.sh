@@ -52,6 +52,30 @@ for path in \
 done
 
 echo
+echo "Live scoring"
+if python3 - <<'PY'
+import pathlib, re, sys
+config = pathlib.Path('src/core/site-config.js').read_text()
+if not re.search(r'liveScoring:\s*\{[^}]*enabled:\s*true', config, re.S):
+    sys.exit(2)
+if not pathlib.Path('public/views/live-scoring/index.html').exists():
+    sys.exit('live scoring enabled but view missing')
+if 'embedUrl:' not in config:
+    sys.exit('live scoring missing embedUrl')
+PY
+then
+  check_http "/public/views/live-scoring/index.html"
+  echo "  OK  live scoring config"
+  pass=$((pass + 1))
+elif [ "$?" = "2" ]; then
+  echo "  OK  live scoring disabled"
+  pass=$((pass + 1))
+else
+  echo "  FAIL live scoring config"
+  fail=$((fail + 1))
+fi
+
+echo
 echo "JavaScript syntax"
 while IFS= read -r file; do
   if node --check "$file" >/dev/null 2>&1; then
@@ -181,6 +205,9 @@ headers = pathlib.Path('_headers').read_text()
 for header in ['Strict-Transport-Security', 'Content-Security-Policy', 'X-Frame-Options']:
     if header not in headers:
         sys.exit(f'_headers missing {header}')
+
+if 'frame-src https://*.golfgenius.com' not in headers:
+    sys.exit('_headers missing Golf Genius frame-src policy')
 
 register_view = pathlib.Path('public/views/register/index.html').read_text()
 if 'data-registration-fee-add' not in register_view:

@@ -102,7 +102,7 @@ const deepFreeze = (value) => {
   };
 
   const siteConfig = deepFreeze({
-    version: '2.0.2',
+    version: '2.0.3',
     brand: {
       name: 'Michigan Players Golf Club',
       shortName: 'Michigan Players',
@@ -123,10 +123,43 @@ const deepFreeze = (value) => {
       ogImageHeight: 630,
       ogImageAlt: 'Great Lakes Amateur, August 17-19, 2026, Eagle Crest Golf Club, Ypsilanti, Michigan'
     },
+    /*
+      Live scoring — Golf Genius iframe (updates during an event; config changes each new event).
+
+      NEXT TOURNAMENT SETUP (about 5 minutes):
+      1. In Golf Genius, create or open the new Eagle Crest / Great Lakes Amateur event.
+      2. Open Apps → Member Portal, then go to Results → Tournament Results (or your custom results page).
+      3. Click Share on that page (iframe is not available on text/collage pages).
+      4. Choose iframe options:
+         - Tournament day view: "Most current in progress round" (recommended for live week).
+         - Hide header/banner if you want a cleaner embed on michiganplayersgolfclub.com.
+      5. Copy the Share iframe URL into liveScoring.embedUrl below.
+      6. Copy the full results page URL from the browser into liveScoring.externalUrl.
+      7. Update title, description, iframeTitle, and refreshNote for the new year if needed.
+      8. Set liveScoring.enabled to true.
+      9. Bump version here and ?v= in index.html (loader, site-config, styles.css) so Cloudflare serves fresh files.
+      10. Deploy to Cloudflare Pages and verify #/live-scoring and the header Tournament button.
+
+      AFTER TOURNAMENT WEEK:
+      - Set liveScoring.enabled to false (header Tournament button returns to Event Details).
+
+      Docs: https://docs.golfgenius.com/en/articles/10777938-using-iframes
+    */
+    liveScoring: {
+      enabled: true,
+      route: '/live-scoring',
+      view: 'public/views/live-scoring/index.html',
+      title: 'Live Results | Great Lakes Amateur',
+      description: 'Live Great Lakes Amateur tournament results and leaderboard updates from Golf Genius at Eagle Crest Golf Club.',
+      embedUrl: 'https://ecgc-greatlakesamateur1.golfgenius.com/leagues/12965061334331854451/widgets/tournament_results?shared=true',
+      externalUrl: 'https://ecgc-greatlakesamateur1.golfgenius.com/pages/12965061404863270754',
+      iframeTitle: 'Great Lakes Amateur live tournament results',
+      refreshNote: 'Results update automatically from Golf Genius during tournament rounds.'
+    },
     callsToAction: [
       {
         label: 'Tournament',
-        route: '/event-details',
+        route: '/live-scoring',
         variant: 'secondary'
       },
       {
@@ -729,6 +762,9 @@ const deepFreeze = (value) => {
    * @param {Object} config
    * @returns {String}
    */
+  const getTournamentRoute = (config) => (
+    config.liveScoring?.enabled ? config.liveScoring.route : '/event-details'
+  );
   const getDefaultRoute = (config) => config.brand.homeRoute;
 
   /**
@@ -743,7 +779,15 @@ const deepFreeze = (value) => {
    * @param {Object} config
    * @returns {Array}
    */
-  const getCallsToAction = (config) => config.callsToAction;
+  const getCallsToAction = (config) => {
+    const tournamentRoute = getTournamentRoute(config);
+
+    return config.callsToAction.map((action) => (
+      action.label === 'Tournament'
+        ? { ...action, route: tournamentRoute }
+        : action
+    ));
+  };
 
   /**
    * @pure
@@ -779,6 +823,13 @@ const deepFreeze = (value) => {
    * @returns {Object}
    */
   const getLocationMap = (config) => config.locationMap;
+
+  /**
+   * @pure
+   * @param {Object} config
+   * @returns {Object}
+   */
+  const getLiveScoring = (config) => config.liveScoring;
 
   /**
    * @pure
@@ -832,7 +883,8 @@ const deepFreeze = (value) => {
    */
   const buildRoutes = (config) => {
     const homeRoute = getDefaultRoute(config);
-    const routes = config.navigation.map((page) => ({
+    const navigation = getNavigation(config);
+    const routes = navigation.map((page) => ({
       path: page.route,
       view: page.view,
       label: page.label,
@@ -840,13 +892,29 @@ const deepFreeze = (value) => {
       description: page.description
     }));
 
+    const liveScoring = config.liveScoring;
+    if (
+      liveScoring?.enabled
+      && liveScoring.route
+      && liveScoring.view
+      && !routes.some((route) => route.path === liveScoring.route)
+    ) {
+      routes.push({
+        path: liveScoring.route,
+        view: liveScoring.view,
+        label: 'Live Results',
+        title: liveScoring.title,
+        description: liveScoring.description
+      });
+    }
+
     return deepFreeze([
       {
         path: '/',
         redirect: homeRoute,
         label: 'Home',
-        title: config.navigation[0].title,
-        description: config.navigation[0].description
+        title: navigation[0].title,
+        description: navigation[0].description
       },
       ...routes
     ]);
@@ -861,8 +929,9 @@ const SiteConfig = deepFreeze({
   getFooter,
     getDeveloperSignature,
     getPayments,
-    getLocationMap,
-    getRegistrationFeeOptions,
+  getLocationMap,
+  getLiveScoring,
+  getRegistrationFeeOptions,
   getRegistrationFeeOption,
   getSponsorshipShowcase,
   buildVenmoPaymentUrl,

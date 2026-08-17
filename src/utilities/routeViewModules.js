@@ -6,7 +6,8 @@
 const moduleCache = Object.seal({
   locationMap: null,
   registration: null,
-  sponsorship: null
+  sponsorship: null,
+  liveScoring: null
 });
 
 /**
@@ -63,5 +64,16 @@ export const hydrateRouteViews = async (config, path) => {
   } else if (moduleCache.sponsorship) {
     const { initSponsorshipShowcase } = await moduleCache.sponsorship;
     initSponsorshipShowcase(config, normalizedPath);
+  }
+
+  if (normalizedPath === '/live-scoring') {
+    const { initLiveScoring } = await loadModule(
+      'liveScoring',
+      () => import('../views/live-scoring/live-scoring.js')
+    );
+    initLiveScoring(config, normalizedPath);
+  } else if (moduleCache.liveScoring) {
+    const { initLiveScoring } = await moduleCache.liveScoring;
+    initLiveScoring(config, normalizedPath);
   }
 };
