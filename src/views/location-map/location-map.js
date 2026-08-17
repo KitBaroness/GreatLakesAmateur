@@ -7,10 +7,6 @@ import { escapeHtml } from '../../utilities/escapeHtml.js';
 import { loadScript, loadStylesheet } from '../../utilities/loadCdnAsset.js';
 import SiteConfig from '../../core/site-config.js';
 
-const DEFAULT_LEAFLET_MODULE = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-const DEFAULT_LEAFLET_STYLESHEET = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-const FALLBACK_LEAFLET_MODULE = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js';
-const FALLBACK_LEAFLET_STYLESHEET = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css';
 const MAP_HOST_SELECTOR = '[data-contact-map]';
 const LIST_HOST_SELECTOR = '[data-map-location-list]';
 const INVALIDATE_DELAYS_MS = Object.freeze([0, 120, 320]);
@@ -147,10 +143,10 @@ const ensureMapResourceHints = () => {
 const loadLeafletAssets = async (mapConfig) => {
   ensureMapResourceHints();
 
-  const primaryScript = mapConfig.moduleUrl || DEFAULT_LEAFLET_MODULE;
-  const primaryStylesheet = mapConfig.stylesheetUrl || DEFAULT_LEAFLET_STYLESHEET;
-  const fallbackScript = mapConfig.fallbackModuleUrl || FALLBACK_LEAFLET_MODULE;
-  const fallbackStylesheet = mapConfig.fallbackStylesheetUrl || FALLBACK_LEAFLET_STYLESHEET;
+  const primaryScript = mapConfig.moduleUrl;
+  const primaryStylesheet = mapConfig.stylesheetUrl;
+  const fallbackScript = mapConfig.fallbackModuleUrl;
+  const fallbackStylesheet = mapConfig.fallbackStylesheetUrl;
   const leafletReady = () => (window.L?.Map ? window.L : null);
 
   runtime.leafletStylesheetPromise ||= loadStylesheet({

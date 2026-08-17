@@ -3,6 +3,7 @@
  */
 
 import SiteConfig from '../../core/site-config.js';
+import { ensureLiveScoringHints } from '../../utilities/liveScoringHints.js';
 
 const ROOT_SELECTOR = '[data-live-scoring-root]';
 const COMPACT_QUERY = '(max-width: 1180px)';
@@ -20,49 +21,6 @@ let mediaCleanup = null;
 const isLiveScoringActive = (liveScoring) => Boolean(
   liveScoring?.enabled && liveScoring.embedUrl && liveScoring.externalUrl
 );
-
-/**
- * @effect
- * @param {String} embedUrl
- * @returns {void}
- */
-const ensureLiveScoringHints = (embedUrl) => {
-  try {
-    const origin = new URL(embedUrl).origin;
-
-    [
-      { rel: 'dns-prefetch', crossOrigin: false },
-      { rel: 'preconnect', crossOrigin: true }
-    ].forEach(({ rel, crossOrigin }) => {
-      const key = `data-live-scoring-${rel}="${origin}"`;
-
-      if (document.querySelector(`link[${key}]`)) {
-        return;
-      }
-
-      const link = document.createElement('link');
-      link.rel = rel;
-      link.href = origin;
-
-      if (crossOrigin) {
-        link.crossOrigin = 'anonymous';
-      }
-
-      link.setAttribute(`data-live-scoring-${rel}`, origin);
-      document.head.appendChild(link);
-    });
-
-    if (!document.querySelector(`link[data-live-scoring-prefetch="${embedUrl}"]`)) {
-      const prefetch = document.createElement('link');
-      prefetch.rel = 'prefetch';
-      prefetch.href = embedUrl;
-      prefetch.setAttribute('data-live-scoring-prefetch', embedUrl);
-      document.head.appendChild(prefetch);
-    }
-  } catch {
-    // Invalid embed URL; skip resource hints.
-  }
-};
 
 /**
  * @effect

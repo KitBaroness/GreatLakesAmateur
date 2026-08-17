@@ -102,7 +102,7 @@ const deepFreeze = (value) => {
   };
 
   const siteConfig = deepFreeze({
-    version: '2.0.8',
+    version: '2.0.9',
     brand: {
       name: 'Michigan Players Golf Club',
       shortName: 'Michigan Players',
@@ -927,8 +927,7 @@ const SiteConfig = deepFreeze({
   getBrand,
   getCallsToAction,
   getFooter,
-    getDeveloperSignature,
-    getPayments,
+  getDeveloperSignature,
   getLocationMap,
   getLiveScoring,
   getRegistrationFeeOptions,

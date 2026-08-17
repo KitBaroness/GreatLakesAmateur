@@ -127,7 +127,8 @@ The site targets fast first paint on mobile networks without a Node build step.
 
 - **Route view code splitting**: `src/utilities/routeViewModules.js` dynamically imports registration, map, sponsorship, and live-scoring modules only when their route is visited (or when cleanup is needed after leaving).
 - **Versioned view fetches**: The router requests `public/views/...?v=<config.version>` so repeat visits can reuse cached fragments from the browser or Cloudflare CDN.
-- **Idle prefetch**: From the home route, likely next pages (`#/event-details`, `#/register`) are prefetched during browser idle time.
+- **Idle prefetch**: From the home route, likely next pages (`#/event-details`, `#/register`, `#/live-scoring` when enabled) are prefetched during browser idle time.
+- **Live scoring hints**: When `liveScoring.enabled` is true, `src/utilities/liveScoringHints.js` injects DNS prefetch, preconnect, and prefetch hints at boot and again on the live results route.
 - **Route-aware hero preload**: `index.html` preloads the home hero AVIF for first paint; `router.js` re-applies preload when visitors return to `#/home`.
 - **Deferred map connections**: Leaflet CDN `preconnect` hints are injected when the contact map initializes, not on every page load.
 - **Lazy map boot**: The contact map waits for viewport intersection before loading Leaflet and tiles.
@@ -185,9 +186,12 @@ Browser-controlled HTTP cache, mail client drafts, SMS drafts, autofill systems,
 - `src/utilities/routeViewModules.js`: Lazy dynamic imports for route-specific view modules.
 - `src/utilities/escapeHtml.js`: Shared HTML escaping helper for markup builders.
 - `src/utilities/loadCdnAsset.js`: Lazy CDN loader with Subresource Integrity support.
+- `src/utilities/liveScoringHints.js`: Shared Golf Genius DNS prefetch, preconnect, and prefetch hints.
+- `src/utilities/mobileNav.js`: Mobile header menu toggle and keyboard interactions.
 - `src/views/registration-invoice/registration-invoice.js`: Register flow, invoice generation, Venmo handoff, PDF download.
-- `src/views/location-map/location-map.js`: Contact-page Leaflet map and hotel list.
+- `src/views/location-map/location-map.js`: Contact-page Leaflet map and hotel list (CDN URLs from config only).
 - `src/views/sponsorship-showcase/sponsorship-showcase.js`: Sponsorship logo carousel and testimonials.
+- `src/views/live-scoring/live-scoring.js`: Golf Genius iframe embed with viewport-fit layout and fallback link.
 - `public/views/`: Static page fragments loaded by the router.
 - `css/styles.css`: BEM component styling only.
 
@@ -211,6 +215,7 @@ The visual theme is tuned for a professional amateur golf event in Great Lakes M
 | `#/contact` | `public/views/contact/index.html` | Call/text/email actions and Leaflet map for Eagle Crest plus nearby hotels |
 | `#/upcoming-events` | `public/views/upcoming-events/index.html` | Upcoming events listing |
 | `#/sponsorship` | `public/views/sponsorship/index.html` | Sponsorship tiers, partner carousel, testimonials, and register links |
+| `#/live-scoring` | `public/views/live-scoring/index.html` | Golf Genius live tournament results embed (when `liveScoring.enabled` is true) |
 
 The old top-level URLs (`contact.html`, `event-details.html`, `upcoming-events.html`, `sponsorship.html`) redirect into the FlexNet SPA via `_redirects` on Cloudflare Pages.
 
